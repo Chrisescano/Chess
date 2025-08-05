@@ -1,12 +1,15 @@
 package com.christian.games.piece;
 
 import com.christian.games.util.Position;
+import java.util.List;
+import java.util.Map;
 
 public abstract class Piece {
 
   private final Position position;
   private final Type type;
   private final Color color;
+  private Map<Integer, List<Position>> moveMap;
 
   public Piece(final Position position, final Type type, final Color color) {
     this.position = position;
@@ -22,6 +25,14 @@ public abstract class Piece {
 
   public int getRank() {
     return position.getY();
+  }
+
+  public boolean isEnemyOf(final Piece piece) {
+    return isEnemyOf(piece.getSymbol().charAt(0));
+  }
+
+  public boolean isEnemyOf(final char symbol) {
+    return Character.isUpperCase(getSymbol().charAt(0)) ^ Character.isUpperCase(symbol);
   }
 
   /*-- Abstract Methods --*/
@@ -40,5 +51,13 @@ public abstract class Piece {
 
   public Color getColor() {
     return color;
+  }
+
+  public Map<Integer, List<Position>> getMoveMap() {
+    return moveMap;
+  }
+
+  public void setMoveMap(Map<Integer, List<Position>> moveMap) {
+    this.moveMap = moveMap;
   }
 }
