@@ -7,8 +7,8 @@ import com.christian.games.util.Position;
 
 public class Pawn extends Piece {
 
-  private static final String WHITE_SYMBOL = "P";
-  private static final String BLACK_SYMBOL = "p";
+  public static final String WHITE_SYMBOL = "P";
+  public static final String BLACK_SYMBOL = "p";
 
   public Pawn(Position position, Color color) {
     super(position, PAWN, color);
