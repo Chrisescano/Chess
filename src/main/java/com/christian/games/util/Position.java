@@ -1,5 +1,7 @@
 package com.christian.games.util;
 
+import java.util.Objects;
+
 public class Position {
 
   public static final Position NORTH = new Position(0, -1, true);
@@ -47,6 +49,27 @@ public class Position {
     return x + (y * 8);
   }
 
+  public void enable() {
+    enabled = true;
+  }
+
+  public void disable() {
+    enabled = false;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Position position)) {
+      return false;
+    }
+    return x == position.x && y == position.y;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(x, y);
+  }
+
   @Override
   public String toString() {
     return "Position{" +
@@ -83,9 +106,5 @@ public class Position {
 
   public boolean isEnabled() {
     return enabled;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
   }
 }

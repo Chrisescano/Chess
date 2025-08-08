@@ -35,6 +35,17 @@ public abstract class Piece {
     return Character.isUpperCase(getSymbol().charAt(0)) ^ Character.isUpperCase(symbol);
   }
 
+  public boolean moveMapContains(final Position position) {
+    for (Integer directionId : moveMap.keySet()) {
+      for (Position move : moveMap.get(directionId)) {
+        if (move.equals(position)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /*-- Abstract Methods --*/
 
   public abstract String getSymbol();

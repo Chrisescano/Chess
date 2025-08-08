@@ -59,27 +59,27 @@ public class MoveUtility {
       boolean isListOfMovesValid = true;
       for (Position move : moveMap.get(directionId)) {
         if (!isListOfMovesValid) {
-          move.setEnabled(false);
+          move.disable();
           continue;
         }
 
         if (isOutOfBounds(move)) {
-          move.setEnabled(false);
+          move.disable();
+          isListOfMovesValid = false;
           continue;
         }
 
         char moveSymbol = board[move.getY()][move.getX()];
-        if (moveSymbol == '\0') {
-          move.setEnabled(true);
+        if (moveSymbol != '\0') {
+          if (piece.isEnemyOf(moveSymbol)) {
+            move.enable();
+          } else {
+            move.disable();
+          }
+          isListOfMovesValid = false;
           continue;
         }
-
-        if (piece.isEnemyOf(moveSymbol)) {
-          move.setEnabled(true);
-        } else {
-          move.setEnabled(false);
-          isListOfMovesValid = false;
-        }
+        move.enable();
       }
     }
   }
@@ -95,7 +95,8 @@ public class MoveUtility {
     return switch (piece.getType()) {
       case PAWN -> {
         Color p1Color = ((Pawn) piece).getP1Color();
-        yield piece.getColor() == WHITE ^ p1Color == WHITE ? Pawn.SOUTH_DIRECTIONS : Pawn.NORTH_DIRECTIONS;
+        yield piece.getColor() == WHITE ^ p1Color == WHITE ? Pawn.SOUTH_DIRECTIONS
+            : Pawn.NORTH_DIRECTIONS;
       }
       case ROOK -> Rook.DIRECTIONS;
       case KNIGHT -> Knight.DIRECTIONS;
