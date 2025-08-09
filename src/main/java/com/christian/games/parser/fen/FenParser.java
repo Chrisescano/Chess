@@ -2,11 +2,12 @@ package com.christian.games.parser.fen;
 
 import com.christian.games.parser.Parser;
 import com.christian.games.pojo.Fen;
+import java.util.List;
 
 public class FenParser implements Parser<String,Fen> {
 
   private final BoardStateParser boardStateParser = new BoardStateParser();
-  private final ActiveColorParser activeColorParser = new ActiveColorParser();
+  private final ColorParser activeColorParser = new ColorParser(List.of("w"), List.of("b"));
   private final CastlingRightsParser castlingRightsParser = new CastlingRightsParser();
   private final EnPassantParser enPassantParser = new EnPassantParser();
   private final NumberParser halfMoveParser = new NumberParser(0, 100);

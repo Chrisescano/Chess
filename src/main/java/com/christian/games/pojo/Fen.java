@@ -7,6 +7,9 @@ import java.util.List;
 
 public class Fen {
 
+  public static final String NEW_GAME_WHITE = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 0";
+  public static final String NEW_GAME_BLACK = "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr b - - 0 0";
+
   private final List<Piece> pieces;
   private final Color activeColor;
   private final boolean[] castlingRights;
@@ -22,12 +25,6 @@ public class Fen {
     this.enPassant = enPassant;
     this.halfMoveClock = halfMoveClock;
     this.fullMoveCounter = fullMoveCounter;
-  }
-
-  /*-- Methods --*/
-
-  public static Fen parse(final String fenString) {
-    return null;
   }
 
   /*-- Getters/Setters --*/
