@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MoveUtility {
+public class ChessUtility {
 
   /*-- Methods --*/
 
@@ -70,7 +70,7 @@ public class MoveUtility {
         }
 
         char moveSymbol = board[move.getY()][move.getX()];
-        if (moveSymbol != '\0') {
+        if (moveSymbol != Character.MIN_VALUE) {
           if (piece.isEnemyOf(moveSymbol)) {
             move.enable();
           } else {

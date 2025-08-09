@@ -1,15 +1,19 @@
 package com.christian.games.piece;
 
+import com.christian.games.chess.ChessUtility;
+import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Piece {
+public abstract class Piece extends BaseInitializer {
 
   private final Position position;
   private final Type type;
   private final Color color;
+
   private Map<Integer, List<Position>> moveMap;
+  private char charSymbol;
 
   public Piece(final Position position, final Type type, final Color color) {
     this.position = position;
@@ -17,7 +21,21 @@ public abstract class Piece {
     this.color = color;
   }
 
+  /*-- Abstract Methods --*/
+
+  public abstract String calculateSymbol();
+
   /*-- Methods --*/
+
+  @Override
+  public void init() {
+    if (initialized) {
+      return;
+    }
+    charSymbol = calculateSymbol().charAt(0);
+    ChessUtility.generateMoveMap(this);
+    initialized = true;
+  }
 
   public int getFile() {
     return position.getX();
@@ -28,11 +46,11 @@ public abstract class Piece {
   }
 
   public boolean isEnemyOf(final Piece piece) {
-    return isEnemyOf(piece.getSymbol().charAt(0));
+    return isEnemyOf(piece.getCharSymbol());
   }
 
   public boolean isEnemyOf(final char symbol) {
-    return Character.isUpperCase(getSymbol().charAt(0)) ^ Character.isUpperCase(symbol);
+    return Character.isUpperCase(charSymbol) ^ Character.isUpperCase(symbol);
   }
 
   public boolean moveMapContains(final Position position) {
@@ -46,9 +64,18 @@ public abstract class Piece {
     return false;
   }
 
-  /*-- Abstract Methods --*/
+  public String toPrettyString() {
+    return String.format("%s %s @ %c%c", type, color, 'a' + position.getX(), '8' - position.getY());
+  }
 
-  public abstract String getSymbol();
+  @Override
+  public String toString() {
+    return "Piece{" +
+        "position=" + position +
+        ", type=" + type +
+        ", color=" + color +
+        '}';
+  }
 
   /*-- Getters/Setters --*/
 
@@ -70,5 +97,9 @@ public abstract class Piece {
 
   public void setMoveMap(Map<Integer, List<Position>> moveMap) {
     this.moveMap = moveMap;
+  }
+
+  public char getCharSymbol() {
+    return charSymbol;
   }
 }

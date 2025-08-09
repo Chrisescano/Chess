@@ -20,8 +20,13 @@ public class CLIScreen extends BaseInitializer implements Screen {
   }
 
   @Override
-  public String getUserMove() {
-    return getLine("Type in your move");
+  public String getUserResponse(final String prompt) {
+    return getLine(prompt);
+  }
+
+  @Override
+  public void pushNotification(String message) {
+    System.out.println(message);
   }
 
   /*-- Helper Methods --*/

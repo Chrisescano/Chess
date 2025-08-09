@@ -19,7 +19,7 @@ public class Queen extends Piece {
   }
 
   @Override
-  public String getSymbol() {
+  public String calculateSymbol() {
     return getColor() == WHITE ? WHITE_SYMBOL : BLACK_SYMBOL;
   }
 }

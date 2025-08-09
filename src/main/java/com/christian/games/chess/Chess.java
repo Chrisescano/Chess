@@ -13,11 +13,16 @@ import java.util.stream.Stream;
 
 public class Chess extends BaseInitializer implements Runnable {
 
+  public static int BOARD_WIDTH = 8;
+  public static int BOARD_HEIGHT = 8;
+
   private final Screen screen;
   private final Fen fen;
   private final Color p1Color;
 
   private AlgebraicNotationParser algebraicNotationParser;
+  private char[][] board;
+  private boolean running;
 
   public Chess(final Screen screen, final Fen fen, final Color p1Color) {
     this.screen = screen;
@@ -32,23 +37,44 @@ public class Chess extends BaseInitializer implements Runnable {
     if (initialized) {
       return;
     }
+
     algebraicNotationParser = new AlgebraicNotationParser();
+    board = new char[BOARD_HEIGHT][BOARD_WIDTH];
+
+    for (Piece piece : fen.getPieces()) {
+      piece.init();
+      Position position = piece.getPosition();
+      board[position.getY()][position.getX()] = piece.getCharSymbol();
+    }
+
+    for (Piece piece : fen.getPieces()) {
+      ChessUtility.markMoveMap(piece, board);
+    }
+
+    running = true;
     initialized = true;
   }
 
   @Override
   public void run() {
-
+    Piece pieceToMove;
+    boolean isUserMoveValid = false;
+    while (running && !isUserMoveValid) {
+      AlgebraicNotation userMove = getAndParseUserMove();
+      List<Piece> results = searchPiece(userMove);
+      pieceToMove = refineSearchResults(results);
+      if (pieceToMove != null) {
+        isUserMoveValid = true;
+      }
+    }
   }
 
   /*-- Helper Methods --*/
 
   private AlgebraicNotation getAndParseUserMove() {
     while (true) {
-      String userMove = screen.getUserMove();
-      if (userMove == null) {
-        continue;
-      }
+      String userMove = screen.getUserResponse(String.format("Player %s Type In Your Move",
+          fen.getActiveColor() == p1Color ? "1" : "2"));
       AlgebraicNotation move = algebraicNotationParser.parse(userMove);
       if (move != null) {
         return move;
@@ -56,7 +82,7 @@ public class Chess extends BaseInitializer implements Runnable {
     }
   }
 
-  private List<Piece> searchUsing(final AlgebraicNotation notation) {
+  private List<Piece> searchPiece(final AlgebraicNotation notation) {
     Stream<Piece> results = fen.getPieces().stream()
         .filter(piece -> piece.getColor() == fen.getActiveColor())
         .filter(piece -> piece.getType() == notation.getType())
@@ -72,5 +98,33 @@ public class Chess extends BaseInitializer implements Runnable {
     }
 
     return results.toList();
+  }
+
+  private Piece refineSearchResults(final List<Piece> results) {
+    if (results.isEmpty()) {
+      return null;
+    }
+
+    if (results.size() == 1) {
+      return results.getFirst();
+    }
+
+    List<String> choices = results.stream().map(Piece::toPrettyString).toList();
+    StringBuilder message = new StringBuilder("Search returned many pieces: ");
+    for (int i = 0; i < choices.size(); i++) {
+      message.append(i + 1).append(") ").append(choices.get(i)).append(" ");
+    }
+    screen.pushNotification(message.toString());
+
+    String userResponse = screen.getUserResponse(String.format(
+        "Player %s choose by entering piece chess notation",
+        fen.getActiveColor() == p1Color ? "1" : "2")
+    );
+    for (int i = 0; i < choices.size(); i++) {
+      if (choices.get(i).contains(userResponse.toLowerCase())) {
+        return results.get(i);
+      }
+    }
+    return null;
   }
 }
