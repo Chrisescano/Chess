@@ -39,5 +39,13 @@
       <artifactId>log4j-slf4j2-impl</artifactId>
       <version>2.24.3</version> <!-- Use latest -->
     </dependency>
+
+    <!-- Testing Library -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>7.10.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

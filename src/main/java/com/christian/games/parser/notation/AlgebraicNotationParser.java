@@ -21,7 +21,14 @@ import java.util.regex.Pattern;
 
 public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation> {
 
-  private final Pattern pattern = Pattern.compile("([RNBQK])?([a-f])?([1-8])?(x)?([a-f])([1-8])([+#])?");
+  private final Pattern pattern = Pattern.compile("^([RNBQK])?([a-f])?([1-8])?(x)?([a-f])([1-8])([+#])?$");
+  private final int TYPE = 1;
+  private final int FROM_FILE = 2;
+  private final int FROM_RANK = 3;
+  private final int IS_CAPTURE = 4;
+  private final int TO_FILE = 5;
+  private final int TO_RANK = 6;
+  private final int IS_CHECK_MATE = 7;
 
   @Override
   public AlgebraicNotation parse(String input) {
@@ -35,12 +42,12 @@ public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation
     }
 
     return new AlgebraicNotation(
-        mapType(matcher.group(1)),
-        mapPosition(matcher.group(2), matcher.group(3)),
-        mapPosition(matcher.group(4), matcher.group(5)),
-        mapOption(matcher.group(6), "x"),
-        mapOption(matcher.group(7), "+"),
-        mapOption(matcher.group(7), "#")
+        mapType(matcher.group(TYPE)),
+        mapPosition(matcher.group(FROM_FILE), matcher.group(FROM_RANK)),
+        mapPosition(matcher.group(TO_FILE), matcher.group(TO_RANK)),
+        mapOption(matcher.group(IS_CAPTURE), "x"),
+        mapOption(matcher.group(IS_CHECK_MATE), "+"),
+        mapOption(matcher.group(IS_CHECK_MATE), "#")
     );
   }
 

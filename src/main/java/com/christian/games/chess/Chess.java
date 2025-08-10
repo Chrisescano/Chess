@@ -59,7 +59,7 @@ public class Chess extends BaseInitializer implements Runnable {
 
   @Override
   public void run() {
-    Piece pieceToMove;
+    Piece pieceToMove = null;
     boolean isUserMoveValid = false;
     while (running && !isUserMoveValid) {
       AlgebraicNotation userMove = getAndParseUserMove();
@@ -69,6 +69,8 @@ public class Chess extends BaseInitializer implements Runnable {
         isUserMoveValid = true;
       }
     }
+
+    System.out.println("Piece to move: " + pieceToMove);
   }
 
   /*-- Helper Methods --*/

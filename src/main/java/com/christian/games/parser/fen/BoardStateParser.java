@@ -39,7 +39,7 @@ public class BoardStateParser implements Parser<String, List<Piece>> {
         file++;
         total++;
       } else if (token >= '1' && token <= '8') {
-        int num = token - '1';
+        int num = token - '0';
         file += num;
         total += num;
       } else if (token == SLASH) {
