@@ -14,24 +14,25 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
 
-  private static final String APP_NAME = "Chess Game";
+  private static final Logger log = LoggerFactory.getLogger(Main.class);
 
+  private static final String APP_NAME = "Chess Game";
   private static final String OPTION_HELP = "h";
   private static final String LONG_OPTION_HELP = "help";
-
   private static final String OPTION_FEN = "f";
   private static final String LONG_OPTION_FEN = "fen";
-
   private static final String OPTION_P1_COLOR = "p";
   private static final String LONG_OPTION_P1_COLOR = "p1color";
-
   private static final String OPTION_SCREEN_TYPE = "s";
   private static final String LONG_OPTION_SCREEN_TYPE = "screen";
 
   public static void main(String[] args) {
+    log.info("Starting {} with the following arguments: {}", APP_NAME, args);
     Options options = new Options();
     addOptions(options);
 
@@ -40,7 +41,7 @@ public class Main {
       CommandLineParser commandLineParser = new DefaultParser();
       commandLine = commandLineParser.parse(options, args);
     } catch (Exception e) {
-      e.printStackTrace(); //should be replaced with logging
+      log.error("An error occurred while parsing program arguments", e);
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp(APP_NAME, options);
     } finally {
@@ -54,7 +55,7 @@ public class Main {
     FenParser fenParser = new FenParser();
     Fen fen = fenParser.parse(commandLine.getOptionValue(OPTION_FEN));
 
-    ColorParser colorParser = new ColorParser(List.of("w", "white"), List.of("b", "black"));
+    ColorParser colorParser = new ColorParser(List.of("w", "white"), List.of("b", "black"), false);
     Color p1Color = colorParser.parse(commandLine.getOptionValue(OPTION_P1_COLOR));
 
     Chess chess = new Chess(screen, fen, p1Color);

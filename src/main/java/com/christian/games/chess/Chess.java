@@ -38,6 +38,8 @@ public class Chess extends BaseInitializer implements Runnable {
       return;
     }
 
+    fen.init();
+
     algebraicNotationParser = new AlgebraicNotationParser();
     board = new char[BOARD_HEIGHT][BOARD_WIDTH];
 

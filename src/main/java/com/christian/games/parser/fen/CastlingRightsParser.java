@@ -3,8 +3,12 @@ package com.christian.games.parser.fen;
 import com.christian.games.parser.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CastlingRightsParser implements Parser<String, boolean[]> {
+
+  private static final Logger log = LoggerFactory.getLogger(CastlingRightsParser.class);
 
   private final Pattern pattern = Pattern.compile("(Q)?(K)?(q)?(k)?");
 
@@ -14,10 +18,7 @@ public class CastlingRightsParser implements Parser<String, boolean[]> {
       return null;
     }
 
-    if (input.equals("-")) {
-      return new boolean[4];
-    }
-
+    log.info("Parsing input {}", input);
     Matcher matcher = pattern.matcher(input);
     if (!matcher.matches()) {
       return null;

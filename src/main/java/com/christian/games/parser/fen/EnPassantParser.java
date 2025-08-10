@@ -4,8 +4,12 @@ import com.christian.games.parser.Parser;
 import com.christian.games.util.Position;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EnPassantParser implements Parser<String, Position> {
+
+  private static final Logger log = LoggerFactory.getLogger(EnPassantParser.class);
 
   private final Pattern pattern = Pattern.compile("([abcdefgh])([36])");
 
@@ -15,10 +19,7 @@ public class EnPassantParser implements Parser<String, Position> {
       return null;
     }
 
-    if (input.equals("-")) {
-      return new Position(-1, -1);
-    }
-
+    log.info("Parsing input {}", input);
     Matcher matcher = pattern.matcher(input);
     if (!matcher.matches()) {
       return null;

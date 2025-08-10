@@ -1,8 +1,12 @@
 package com.christian.games.parser.fen;
 
 import com.christian.games.parser.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NumberParser implements Parser<String, Integer> {
+
+  private static final Logger log = LoggerFactory.getLogger(NumberParser.class);
 
   private final int mininum;
   private final int maximum;
@@ -18,6 +22,7 @@ public class NumberParser implements Parser<String, Integer> {
       return null;
     }
 
+    log.info("Parsing input {}", input);
     try {
       int parsedInput = Integer.parseInt(input);
       if (parsedInput >= mininum && parsedInput <= maximum) {

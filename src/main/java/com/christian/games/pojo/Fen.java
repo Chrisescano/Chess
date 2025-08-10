@@ -1,30 +1,79 @@
 package com.christian.games.pojo;
 
+import static com.christian.games.piece.Color.WHITE;
+
 import com.christian.games.piece.Color;
 import com.christian.games.piece.Piece;
+import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Fen {
+public class Fen extends BaseInitializer {
 
   public static final String NEW_GAME_WHITE = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 0";
   public static final String NEW_GAME_BLACK = "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr b - - 0 0";
 
+  private static final Logger log = LoggerFactory.getLogger(Fen.class);
+
   private final List<Piece> pieces;
-  private final Color activeColor;
-  private final boolean[] castlingRights;
-  private final Position enPassant;
-  private final int halfMoveClock;
-  private final int fullMoveCounter;
+  private Color activeColor;
+  private boolean[] castlingRights;
+  private Position enPassant;
+  private Integer halfMoveClock;
+  private Integer fullMoveCounter;
 
   public Fen(final List<Piece> pieces, final Color activeColor, final boolean[] castlingRights,
-      final Position enPassant, final int halfMoveClock, final int fullMoveCounter) {
+      final Position enPassant, final Integer halfMoveClock, final Integer fullMoveCounter) {
     this.pieces = pieces;
     this.activeColor = activeColor;
     this.castlingRights = castlingRights;
     this.enPassant = enPassant;
     this.halfMoveClock = halfMoveClock;
     this.fullMoveCounter = fullMoveCounter;
+  }
+
+  /*-- Methods --*/
+
+  @Override
+  public void init() {
+    if (initialized) {
+      return;
+    }
+
+    if (pieces == null) {
+      log.error("Failed to initialize - Pieces is set to null");
+      throw new NullPointerException("Pieces cannot be null");
+    }
+
+    if (activeColor == null) {
+      log.warn("Active Color was set to null - Defaulting to {}", WHITE);
+      activeColor = WHITE;
+    }
+
+    if (castlingRights == null) {
+      castlingRights = new boolean[4];
+      log.warn("Castling rights was set to null - Defaulting to {}", castlingRights);
+    }
+
+    if (enPassant == null) {
+      enPassant = new Position(-1, -1);
+      enPassant.disable();
+      log.warn("En Passant was set to null - Defaulting to {}", enPassant);
+    }
+
+    if (halfMoveClock == null) {
+      halfMoveClock = 0;
+      log.warn("Half Move clock was set to null - Defaulting to {}", halfMoveClock);
+    }
+
+    if (fullMoveCounter == null) {
+      fullMoveCounter = 0;
+      log.warn("Full Move counter was set to null - Defaulting to {}", fullMoveCounter);
+    }
+
+    initialized = true;
   }
 
   /*-- Getters/Setters --*/
@@ -45,11 +94,11 @@ public class Fen {
     return enPassant;
   }
 
-  public int getHalfMoveClock() {
+  public Integer getHalfMoveClock() {
     return halfMoveClock;
   }
 
-  public int getFullMoveCounter() {
+  public Integer getFullMoveCounter() {
     return fullMoveCounter;
   }
 }

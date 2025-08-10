@@ -14,8 +14,12 @@ import com.christian.games.piece.Rook;
 import com.christian.games.util.Position;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BoardStateParser implements Parser<String, List<Piece>> {
+
+  private static final Logger log = LoggerFactory.getLogger(BoardStateParser.class);
 
   private static final char SLASH = '/';
 
@@ -25,6 +29,7 @@ public class BoardStateParser implements Parser<String, List<Piece>> {
       return null;
     }
 
+    log.info("Parsing input {}", input);
     List<Piece> pieces = new ArrayList<>();
     int file = 0, rank = 0, total = 0;
     for (char token : input.toCharArray()) {
@@ -41,10 +46,16 @@ public class BoardStateParser implements Parser<String, List<Piece>> {
         file = 0;
         rank++;
       } else {
+        log.error("Unrecognized token [{}]", token);
         break;
       }
     }
-    return total == 64 ? pieces : null;
+    if (total == 64) {
+      return pieces;
+    } else {
+      log.error("Input accounted for [{}] tiles instead of 64", total);
+      return null;
+    }
   }
 
   @Override

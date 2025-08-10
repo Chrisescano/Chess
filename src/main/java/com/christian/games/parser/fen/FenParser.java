@@ -3,8 +3,12 @@ package com.christian.games.parser.fen;
 import com.christian.games.parser.Parser;
 import com.christian.games.pojo.Fen;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FenParser implements Parser<String,Fen> {
+
+  private static final Logger log = LoggerFactory.getLogger(FenParser.class);
 
   private final BoardStateParser boardStateParser = new BoardStateParser();
   private final ColorParser activeColorParser = new ColorParser(List.of("w"), List.of("b"));
@@ -18,6 +22,8 @@ public class FenParser implements Parser<String,Fen> {
     if (input == null) {
       return null;
     }
+
+    log.info("Parsing input {}", input);
     String[] fenComponents = input.split(" ");
     return new Fen(
         boardStateParser.parse(getString(fenComponents, 0)),
