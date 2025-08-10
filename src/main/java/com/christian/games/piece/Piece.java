@@ -28,13 +28,9 @@ public abstract class Piece extends BaseInitializer {
   /*-- Methods --*/
 
   @Override
-  public void init() {
-    if (initialized) {
-      return;
-    }
+  public void doInit() {
     charSymbol = calculateSymbol().charAt(0);
     ChessUtility.generateMoveMap(this);
-    initialized = true;
   }
 
   public int getFile() {
