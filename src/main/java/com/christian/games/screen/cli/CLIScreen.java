@@ -1,22 +1,18 @@
 package com.christian.games.screen.cli;
 
-import com.christian.games.screen.Screen;
-import com.christian.games.util.BaseInitializer;
+import com.christian.games.screen.AbstractScreen;
 import java.util.Scanner;
 
-public class CLIScreen extends BaseInitializer implements Screen {
+public class CLIScreen extends AbstractScreen {
 
   private Scanner scanner;
 
   /*-- Methods --*/
 
   @Override
-  public void init() {
-    if (initialized) {
-      return;
-    }
+  public void doInit() {
+    super.init();
     scanner = new Scanner(System.in);
-    initialized = true;
   }
 
   @Override

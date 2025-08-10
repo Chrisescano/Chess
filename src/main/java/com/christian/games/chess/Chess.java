@@ -33,11 +33,7 @@ public class Chess extends BaseInitializer implements Runnable {
   /*-- Methods --*/
 
   @Override
-  public void init() {
-    if (initialized) {
-      return;
-    }
-
+  public void doInit() {
     fen.init();
 
     algebraicNotationParser = new AlgebraicNotationParser();
@@ -54,7 +50,6 @@ public class Chess extends BaseInitializer implements Runnable {
     }
 
     running = true;
-    initialized = true;
   }
 
   @Override

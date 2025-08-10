@@ -37,11 +37,7 @@ public class Fen extends BaseInitializer {
   /*-- Methods --*/
 
   @Override
-  public void init() {
-    if (initialized) {
-      return;
-    }
-
+  public void doInit() {
     if (pieces == null) {
       log.error("Failed to initialize - Pieces is set to null");
       throw new NullPointerException("Pieces cannot be null");
@@ -72,8 +68,6 @@ public class Fen extends BaseInitializer {
       fullMoveCounter = 0;
       log.warn("Full Move counter was set to null - Defaulting to {}", fullMoveCounter);
     }
-
-    initialized = true;
   }
 
   /*-- Getters/Setters --*/

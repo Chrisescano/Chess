@@ -6,6 +6,7 @@ import com.christian.games.parser.fen.FenParser;
 import com.christian.games.piece.Color;
 import com.christian.games.pojo.Fen;
 import com.christian.games.screen.Screen;
+import com.christian.games.screen.ScreenFactory;
 import com.christian.games.screen.cli.CLIScreen;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -50,7 +51,7 @@ public class Main {
       }
     }
 
-    Screen screen = getScreen(commandLine.getOptionValue(OPTION_SCREEN_TYPE));
+    Screen screen = ScreenFactory.create(commandLine.getOptionValue(OPTION_SCREEN_TYPE));
 
     FenParser fenParser = new FenParser();
     Fen fen = fenParser.parse(commandLine.getOptionValue(OPTION_FEN));
@@ -88,11 +89,5 @@ public class Main {
             .desc("Screen type to display game on")
             .hasArg().build()
     );
-  }
-
-  public static Screen getScreen(final String screenType) {
-    CLIScreen cliScreen = new CLIScreen();
-    cliScreen.init();
-    return cliScreen;
   }
 }
