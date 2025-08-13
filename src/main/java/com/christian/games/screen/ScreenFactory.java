@@ -8,6 +8,10 @@ public class ScreenFactory {
 
   private static final Logger log = LoggerFactory.getLogger(ScreenFactory.class);
 
+  private ScreenFactory() {}
+
+  /*-- Methods --*/
+
   public static Screen create(final String type) {
     AbstractScreen screen;
     switch (type.toLowerCase()) {

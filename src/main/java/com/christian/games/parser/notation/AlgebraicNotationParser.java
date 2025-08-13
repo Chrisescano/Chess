@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation> {
 
-  private final Pattern pattern = Pattern.compile("^([RNBQK])?([a-f])?([1-8])?(x)?([a-f])([1-8])([+#])?$");
+  private final Pattern pattern = Pattern.compile("^([RNBQK])?([a-h])?([1-8])?(x)?([a-h])([1-8])([+#])?$");
   private final int TYPE = 1;
   private final int FROM_FILE = 2;
   private final int FROM_RANK = 3;

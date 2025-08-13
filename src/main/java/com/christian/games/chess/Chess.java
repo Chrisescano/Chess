@@ -10,11 +10,15 @@ import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
 import java.util.List;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Chess extends BaseInitializer implements Runnable {
 
   public static int BOARD_WIDTH = 8;
   public static int BOARD_HEIGHT = 8;
+
+  private static final Logger log = LoggerFactory.getLogger(Chess.class);
 
   private final Screen screen;
   private final Fen fen;
@@ -40,7 +44,6 @@ public class Chess extends BaseInitializer implements Runnable {
     board = new char[BOARD_HEIGHT][BOARD_WIDTH];
 
     for (Piece piece : fen.getPieces()) {
-      piece.init();
       Position position = piece.getPosition();
       board[position.getY()][position.getX()] = piece.getCharSymbol();
     }
@@ -85,9 +88,9 @@ public class Chess extends BaseInitializer implements Runnable {
     Stream<Piece> results = fen.getPieces().stream()
         .filter(piece -> piece.getColor() == fen.getActiveColor())
         .filter(piece -> piece.getType() == notation.getType())
-        .filter(piece -> piece.moveMapContains(notation.getTo()));
+        .filter(piece -> piece.moveMapContains(notation.getEnding()));
 
-    Position startingPos = notation.getTo();
+    Position startingPos = notation.getStarting();
     if (startingPos.getX() != -1) {
       results = results.filter(piece -> piece.getFile() == startingPos.getX());
     }
@@ -108,20 +111,21 @@ public class Chess extends BaseInitializer implements Runnable {
       return results.getFirst();
     }
 
-    List<String> choices = results.stream().map(Piece::toPrettyString).toList();
-    StringBuilder message = new StringBuilder("Search returned many pieces: ");
-    for (int i = 0; i < choices.size(); i++) {
-      message.append(i + 1).append(") ").append(choices.get(i)).append(" ");
+    List<String> pieceStrings = results.stream().map(Piece::toPrettyString).toList();
+    StringBuilder message = new StringBuilder("Search returned: ");
+    for (String pieceString : pieceStrings) {
+      message.append(pieceString).append(",");
     }
+    message.replace(message.length() - 1, message.length(), "");
     screen.pushNotification(message.toString());
 
     String userResponse = screen.getUserResponse(String.format(
         "Player %s choose by entering piece chess notation",
         fen.getActiveColor() == p1Color ? "1" : "2")
     );
-    for (int i = 0; i < choices.size(); i++) {
-      if (choices.get(i).contains(userResponse.toLowerCase())) {
-        return results.get(i);
+    for (Piece piece : results) {
+      if (piece.getPosition().toChessNotation().equalsIgnoreCase(userResponse.toLowerCase())) {
+        return piece;
       }
     }
     return null;

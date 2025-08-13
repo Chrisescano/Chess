@@ -7,8 +7,8 @@ import java.util.Objects;
 public class AlgebraicNotation {
 
   private final Type type;
-  private final Position from;
-  private final Position to;
+  private final Position starting;
+  private final Position ending;
   private final boolean capture;
   private final boolean check;
   private final boolean mate;
@@ -20,8 +20,8 @@ public class AlgebraicNotation {
   public AlgebraicNotation(final Type type, final Position from, final Position to,
       final boolean capture, final boolean check, final boolean mate) {
     this.type = type;
-    this.from = from;
-    this.to = to;
+    this.starting = from;
+    this.ending = to;
     this.capture = capture;
     this.check = check;
     this.mate = mate;
@@ -35,20 +35,20 @@ public class AlgebraicNotation {
       return false;
     }
     return capture == that.capture && check == that.check && mate == that.mate && type == that.type
-        && Objects.equals(from, that.from) && Objects.equals(to, that.to);
+        && Objects.equals(starting, that.starting) && Objects.equals(ending, that.ending);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, from, to, capture, check, mate);
+    return Objects.hash(type, starting, ending, capture, check, mate);
   }
 
   @Override
   public String toString() {
     return "AlgebraicNotation{" +
         "type=" + type +
-        ", from=" + from +
-        ", to=" + to +
+        ", from=" + starting +
+        ", to=" + ending +
         ", capture=" + capture +
         ", check=" + check +
         ", mate=" + mate +
@@ -61,12 +61,12 @@ public class AlgebraicNotation {
     return type;
   }
 
-  public Position getFrom() {
-    return from;
+  public Position getStarting() {
+    return starting;
   }
 
-  public Position getTo() {
-    return to;
+  public Position getEnding() {
+    return ending;
   }
 
   public boolean isCapture() {

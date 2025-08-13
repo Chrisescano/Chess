@@ -61,7 +61,7 @@ public abstract class Piece extends BaseInitializer {
   }
 
   public String toPrettyString() {
-    return String.format("%s %s @ %c%c", type, color, 'a' + position.getX(), '8' - position.getY());
+    return String.format("%s %s @ %s", color, type, position.toChessNotation());
   }
 
   @Override

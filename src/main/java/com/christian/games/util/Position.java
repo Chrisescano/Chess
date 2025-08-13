@@ -16,16 +16,21 @@ public class Position {
   private int x;
   private int y;
   private boolean locked;
-  private boolean enabled = true;
+  private boolean enabled;
 
   public Position(final int x, final int y) {
-    this(x, y, false);
+    this(x, y, false, true);
   }
 
   public Position(int x, int y, boolean locked) {
+    this(x, y, locked, true);
+  }
+
+  public Position(int x, int y, boolean locked, boolean enabled) {
     this.x = x;
     this.y = y;
     this.locked = locked;
+    this.enabled = enabled;
   }
 
   /*-- Methods --*/
@@ -45,8 +50,20 @@ public class Position {
     }
   }
 
+  public String toChessNotation() {
+    return String.format("%c%c",'a' + x, '8' - y);
+  }
+
   public int toId() {
     return x + (y * 8);
+  }
+
+  public void lock() {
+    locked = true;
+  }
+
+  public void unlock() {
+    locked = false;
   }
 
   public void enable() {
@@ -100,8 +117,8 @@ public class Position {
     }
   }
 
-  public void setLocked(boolean locked) {
-    this.locked = locked;
+  public boolean isLocked() {
+    return locked;
   }
 
   public boolean isEnabled() {

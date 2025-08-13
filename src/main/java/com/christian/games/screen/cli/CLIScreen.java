@@ -11,7 +11,6 @@ public class CLIScreen extends AbstractScreen {
 
   @Override
   public void doInit() {
-    super.init();
     scanner = new Scanner(System.in);
   }
 
