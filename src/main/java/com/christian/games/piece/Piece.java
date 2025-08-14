@@ -4,7 +4,6 @@ import com.christian.games.chess.ChessUtility;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
 import java.util.List;
-import java.util.Map;
 
 public abstract class Piece extends BaseInitializer {
 
@@ -12,7 +11,7 @@ public abstract class Piece extends BaseInitializer {
   private final Type type;
   private final Color color;
 
-  private Map<Integer, List<Position>> moveMap;
+  private List<Position> moves;
   private char charSymbol;
 
   public Piece(final Position position, final Type type, final Color color) {
@@ -49,15 +48,14 @@ public abstract class Piece extends BaseInitializer {
     return Character.isUpperCase(charSymbol) ^ Character.isUpperCase(symbol);
   }
 
+  public boolean isOneTileAwayFrom(final Position position) {
+    int xDiff = position.getX() - this.position.getX();
+    int yDiff = position.getY() - this.position.getY();
+    return xDiff >= -1 && xDiff <= 1 && yDiff >= -1 && yDiff <= 1;
+  }
+
   public boolean moveMapContains(final Position position) {
-    for (Integer directionId : moveMap.keySet()) {
-      for (Position move : moveMap.get(directionId)) {
-        if (move.equals(position)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return moves.stream().anyMatch(move -> move.equals(position) && move.isEnabled());
   }
 
   public String toPrettyString() {
@@ -87,12 +85,12 @@ public abstract class Piece extends BaseInitializer {
     return color;
   }
 
-  public Map<Integer, List<Position>> getMoveMap() {
-    return moveMap;
+  public List<Position> getMoves() {
+    return moves;
   }
 
-  public void setMoveMap(Map<Integer, List<Position>> moveMap) {
-    this.moveMap = moveMap;
+  public void setMoves(List<Position> moves) {
+    this.moves = moves;
   }
 
   public char getCharSymbol() {

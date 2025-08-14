@@ -73,7 +73,7 @@ public class Chess extends BaseInitializer implements Runnable {
     /*
     TODO:
       (2) work on next steps
-        - searching for piece requires check if position is enabled (not only if movemap.contains())
+        - searching for piece requires check if position is enabled (not only if movemap.contains()) [done]
         - some pieces have special moves:
           - pawn double move at start
           - pawn en passant

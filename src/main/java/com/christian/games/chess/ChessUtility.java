@@ -12,9 +12,7 @@ import com.christian.games.piece.Queen;
 import com.christian.games.piece.Rook;
 import com.christian.games.util.Position;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ChessUtility {
 
@@ -26,18 +24,16 @@ public class ChessUtility {
       case ROOK, BISHOP, QUEEN -> 7;
     };
 
-    Map<Integer, List<Position>> moveMap = new HashMap<>();
+    List<Position> moves = new ArrayList<>();
     for (Position direction : directionsOf(piece)) {
-      List<Position> moves = new ArrayList<>();
       for (int i = 0; i < range; i++) {
         int moveX = piece.getFile() + (direction.getX() * (i + 1));
         int moveY = piece.getRank() + (direction.getY() * (i + 1));
         moves.add(new Position(moveX, moveY));
       }
-      moveMap.put(direction.toId(), moves);
     }
 
-    piece.setMoveMap(moveMap);
+    piece.setMoves(moves);
   }
 
   public static void updateMoveMap(final Piece piece, final Position destination) {
@@ -45,42 +41,42 @@ public class ChessUtility {
     int yDiff = destination.getY() - piece.getRank();
     Position diff = new Position(xDiff, yDiff);
 
-    Map<Integer, List<Position>> moveMap = piece.getMoveMap();
-    for (Integer directionId : moveMap.keySet()) {
-      for (Position move : moveMap.get(directionId)) {
-        move.add(diff);
-      }
+    List<Position> moves = piece.getMoves();
+    for (Position move : moves) {
+      move.add(diff);
     }
   }
 
   public static void markMoveMap(final Piece piece, char[][] board) {
-    Map<Integer, List<Position>> moveMap = piece.getMoveMap();
-    for (Integer directionId : moveMap.keySet()) {
-      boolean isListOfMovesValid = true;
-      for (Position move : moveMap.get(directionId)) {
-        if (!isListOfMovesValid) {
-          move.disable();
-          continue;
-        }
-
-        if (isOutOfBounds(move)) {
-          move.disable();
-          isListOfMovesValid = false;
-          continue;
-        }
-
-        char moveSymbol = board[move.getY()][move.getX()];
-        if (moveSymbol != Character.MIN_VALUE) {
-          if (piece.isEnemyOf(moveSymbol)) {
-            move.enable();
-          } else {
-            move.disable();
-          }
-          isListOfMovesValid = false;
-          continue;
-        }
-        move.enable();
+    boolean validDirection = true;
+    for (Position move : piece.getMoves()) {
+      if (piece.isOneTileAwayFrom(move)) {
+        validDirection = true;
       }
+
+      if (!validDirection) {
+        move.disable();
+        continue;
+      }
+
+      if (isOutOfBounds(move)) {
+        move.disable();
+        validDirection = false;
+        continue;
+      }
+
+      char tileSymbol = board[move.getY()][move.getX()];
+      if (tileSymbol != Character.MIN_VALUE) {
+        if (piece.isEnemyOf(tileSymbol)) {
+          move.enable();
+        } else {
+          move.disable();
+        }
+        validDirection = false;
+        continue;
+      }
+
+      move.enable();
     }
   }
 
