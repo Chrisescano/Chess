@@ -1,10 +1,10 @@
-package com.christian.games.pojo;
+package com.christian.games.pojo.notation;
 
 import com.christian.games.piece.Type;
 import com.christian.games.util.Position;
 import java.util.Objects;
 
-public class AlgebraicNotation {
+public class Algebraic {
 
   private final Type type;
   private final Position starting;
@@ -13,11 +13,11 @@ public class AlgebraicNotation {
   private final boolean check;
   private final boolean mate;
 
-  public AlgebraicNotation(final Type type, final Position from, final Position to) {
+  public Algebraic(final Type type, final Position from, final Position to) {
     this(type, from, to, false, false, false);
   }
 
-  public AlgebraicNotation(final Type type, final Position from, final Position to,
+  public Algebraic(final Type type, final Position from, final Position to,
       final boolean capture, final boolean check, final boolean mate) {
     this.type = type;
     this.starting = from;
@@ -31,7 +31,7 @@ public class AlgebraicNotation {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof AlgebraicNotation that)) {
+    if (!(o instanceof Algebraic that)) {
       return false;
     }
     return capture == that.capture && check == that.check && mate == that.mate && type == that.type

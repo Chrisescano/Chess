@@ -3,12 +3,14 @@ package com.christian.games.chess;
 import com.christian.games.parser.notation.AlgebraicNotationParser;
 import com.christian.games.piece.Color;
 import com.christian.games.piece.Piece;
-import com.christian.games.pojo.AlgebraicNotation;
+import com.christian.games.pojo.notation.Algebraic;
 import com.christian.games.pojo.Fen;
 import com.christian.games.screen.Screen;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ public class Chess extends BaseInitializer implements Runnable {
   public static int BOARD_HEIGHT = 8;
 
   private static final Logger log = LoggerFactory.getLogger(Chess.class);
-
   private final Screen screen;
   private final Fen fen;
   private final Color p1Color;
@@ -57,23 +58,40 @@ public class Chess extends BaseInitializer implements Runnable {
 
   @Override
   public void run() {
-    Piece pieceToMove = null;
-    boolean isUserMoveValid = false;
-    while (running && !isUserMoveValid) {
-      AlgebraicNotation userMove = getAndParseUserMove();
-      List<Piece> results = searchPiece(userMove);
-      pieceToMove = refineSearchResults(results);
-      if (pieceToMove != null) {
-        isUserMoveValid = true;
+    while (running) {
+      Algebraic playerMove = getAndParseUserMove();
+      Piece playerPiece = refineSearchResults(searchPiece(playerMove));
+
+      if (playerPiece == null) {
+        continue; //bad input or no piece exists w/ input
+      }
+      log.debug("Player wants to move the following piece [{}]", playerPiece);
+
+      Position startPos = playerPiece.getPosition();
+      Position endPos = playerMove.getEnding();
+
+      playerPiece.getPosition().update(endPos);
+      ChessUtility.updateMoveMap(playerPiece, endPos);
+      board[startPos.getY()][startPos.getX()] = Character.MIN_VALUE;
+      board[endPos.getY()][endPos.getX()] = playerPiece.getCharSymbol();
+
+      Set<Piece> pieces = new HashSet<>();
+      pieces.add(playerPiece);
+      pieces.addAll(fen.getPieces().stream()
+          .filter(piece -> piece.moveMapContains(List.of(startPos, endPos)))
+          .toList());
+      pieces.forEach(piece -> ChessUtility.markMoveMap(piece, board));
+
+      fen.switchActiveColor();
+      fen.incrementHalfMoveClock();
+      if (fen.getHalfMoveClock() != 0 && fen.getHalfMoveClock() % 2 == 0) {
+        fen.incrementFullMoveCounter();
       }
     }
-
-    log.debug("Player wants to move the following piece [{}]", pieceToMove);
 
     /*
     TODO:
       (2) work on next steps
-        - searching for piece requires check if position is enabled (not only if movemap.contains()) [done]
         - some pieces have special moves:
           - pawn double move at start
           - pawn en passant
@@ -89,18 +107,18 @@ public class Chess extends BaseInitializer implements Runnable {
 
   /*-- Helper Methods --*/
 
-  private AlgebraicNotation getAndParseUserMove() {
+  private Algebraic getAndParseUserMove() {
     while (true) {
       String userMove = screen.getUserResponse(String.format("Player %s Type In Your Move",
           fen.getActiveColor() == p1Color ? "1" : "2"));
-      AlgebraicNotation move = algebraicNotationParser.parse(userMove);
+      Algebraic move = algebraicNotationParser.parse(userMove);
       if (move != null) {
         return move;
       }
     }
   }
 
-  private List<Piece> searchPiece(final AlgebraicNotation notation) {
+  private List<Piece> searchPiece(final Algebraic notation) {
     Stream<Piece> results = fen.getPieces().stream()
         .filter(piece -> piece.getColor() == fen.getActiveColor())
         .filter(piece -> piece.getType() == notation.getType())

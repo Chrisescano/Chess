@@ -1,5 +1,6 @@
 package com.christian.games.pojo;
 
+import static com.christian.games.piece.Color.BLACK;
 import static com.christian.games.piece.Color.WHITE;
 
 import com.christian.games.piece.Color;
@@ -70,6 +71,18 @@ public class Fen extends BaseInitializer {
       fullMoveCounter = 0;
       log.warn("Full Move counter was set to null - Defaulting to {}", fullMoveCounter);
     }
+  }
+
+  public void switchActiveColor() {
+    activeColor = activeColor == WHITE ? BLACK : WHITE;
+  }
+
+  public void incrementHalfMoveClock() {
+    halfMoveClock++;
+  }
+
+  public void incrementFullMoveCounter() {
+    fullMoveCounter++;
   }
 
   /*-- Getters/Setters --*/

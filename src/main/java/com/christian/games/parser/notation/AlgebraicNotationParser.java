@@ -14,14 +14,14 @@ import com.christian.games.piece.Knight;
 import com.christian.games.piece.Queen;
 import com.christian.games.piece.Rook;
 import com.christian.games.piece.Type;
-import com.christian.games.pojo.AlgebraicNotation;
+import com.christian.games.pojo.notation.Algebraic;
 import com.christian.games.util.Position;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation> {
+public class AlgebraicNotationParser implements Parser<String, Algebraic> {
 
   private static final Logger log = LoggerFactory.getLogger(AlgebraicNotationParser.class);
 
@@ -35,7 +35,7 @@ public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation
   private final int IS_CHECK_MATE = 7;
 
   @Override
-  public AlgebraicNotation parse(String input) {
+  public Algebraic parse(String input) {
     if (input == null) {
       return null;
     }
@@ -46,7 +46,7 @@ public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation
       return null;
     }
 
-    return new AlgebraicNotation(
+    return new Algebraic(
         mapType(matcher.group(TYPE)),
         mapPosition(matcher.group(FROM_FILE), matcher.group(FROM_RANK)),
         mapPosition(matcher.group(TO_FILE), matcher.group(TO_RANK)),
@@ -57,7 +57,7 @@ public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation
   }
 
   @Override
-  public String unparse(AlgebraicNotation input) {
+  public String unparse(Algebraic input) {
     return "";
   }
 

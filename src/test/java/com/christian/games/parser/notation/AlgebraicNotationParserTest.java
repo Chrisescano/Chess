@@ -3,7 +3,7 @@ package com.christian.games.parser.notation;
 import static com.christian.games.piece.Type.PAWN;
 import static com.christian.games.piece.Type.ROOK;
 
-import com.christian.games.pojo.AlgebraicNotation;
+import com.christian.games.pojo.notation.Algebraic;
 import com.christian.games.util.Position;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -25,18 +25,18 @@ public class AlgebraicNotationParserTest {
   @DataProvider(name = "parserDataProvider")
   public Object[][] parserDataProvider() {
     return new Object[][] {
-        {1, "a2", new AlgebraicNotation(PAWN, testNullPos, testTo)},
-        {2, "Ra2", new AlgebraicNotation(ROOK, testNullPos, testTo)},
-        {3, "Rxa2", new AlgebraicNotation(ROOK, testNullPos, testTo, true, false, false)},
-        {4, "Rb1a2", new AlgebraicNotation(ROOK, testFrom, testTo)},
-        {5, "Ra2+", new AlgebraicNotation(ROOK, testNullPos, testTo, false, true, false)},
-        {6, "Ra2#", new AlgebraicNotation(ROOK, testNullPos, testTo, false, false, true)}
+        {1, "a2", new Algebraic(PAWN, testNullPos, testTo)},
+        {2, "Ra2", new Algebraic(ROOK, testNullPos, testTo)},
+        {3, "Rxa2", new Algebraic(ROOK, testNullPos, testTo, true, false, false)},
+        {4, "Rb1a2", new Algebraic(ROOK, testFrom, testTo)},
+        {5, "Ra2+", new Algebraic(ROOK, testNullPos, testTo, false, true, false)},
+        {6, "Ra2#", new Algebraic(ROOK, testNullPos, testTo, false, false, true)}
     };
   }
 
   @Test(dataProvider = "parserDataProvider")
-  public void testParser(int testCase, String inputString, AlgebraicNotation expectedResult) {
-    AlgebraicNotation actualResult = parser.parse(inputString);
+  public void testParser(int testCase, String inputString, Algebraic expectedResult) {
+    Algebraic actualResult = parser.parse(inputString);
     Assert.assertEquals(actualResult, expectedResult, String.format("Test case %d: expected %s for input [%s]", testCase, expectedResult, inputString));
   }
 }

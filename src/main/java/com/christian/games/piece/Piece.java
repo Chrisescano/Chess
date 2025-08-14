@@ -58,6 +58,15 @@ public abstract class Piece extends BaseInitializer {
     return moves.stream().anyMatch(move -> move.equals(position) && move.isEnabled());
   }
 
+  public boolean moveMapContains(final List<Position> positions) {
+    for (Position position : positions) {
+      if (moveMapContains(position)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public String toPrettyString() {
     return String.format("%s %s @ %s", color, type, position.toChessNotation());
   }

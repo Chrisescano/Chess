@@ -50,6 +50,13 @@ public class Position {
     }
   }
 
+  public void update(final Position position) {
+    if (!locked) {
+      x = position.x;
+      y = position.y;
+    }
+  }
+
   public String toChessNotation() {
     return String.format("%c%c",'a' + x, '8' - y);
   }
