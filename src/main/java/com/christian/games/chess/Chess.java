@@ -68,7 +68,23 @@ public class Chess extends BaseInitializer implements Runnable {
       }
     }
 
-    System.out.println("Piece to move: " + pieceToMove);
+    log.debug("Player wants to move the following piece [{}]", pieceToMove);
+
+    /*
+    TODO:
+      (2) work on next steps
+        - searching for piece requires check if position is enabled (not only if movemap.contains())
+        - some pieces have special moves:
+          - pawn double move at start
+          - pawn en passant
+          - king and queen side castling
+          - pieces being pinned (from king being at risk of check)
+        - need to update movemap or store special moves in own list??
+      (3) after move is made need to update movemap
+        - utility method already exists but need to:
+          - get all pieces who could interact with piece old position and update their move maps
+          - get all pieces who can interact with piece new position and update their move maps
+     */
   }
 
   /*-- Helper Methods --*/
@@ -99,6 +115,7 @@ public class Chess extends BaseInitializer implements Runnable {
       results = results.filter(piece -> piece.getRank() == startingPos.getY());
     }
 
+    log.debug("Search criteria: [{}] resulted in {}", notation, results);
     return results.toList();
   }
 

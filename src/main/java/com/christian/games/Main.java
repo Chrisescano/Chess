@@ -7,7 +7,6 @@ import com.christian.games.piece.Color;
 import com.christian.games.pojo.Fen;
 import com.christian.games.screen.Screen;
 import com.christian.games.screen.ScreenFactory;
-import com.christian.games.screen.cli.CLIScreen;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

@@ -18,8 +18,12 @@ import com.christian.games.pojo.AlgebraicNotation;
 import com.christian.games.util.Position;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation> {
+
+  private static final Logger log = LoggerFactory.getLogger(AlgebraicNotationParser.class);
 
   private final Pattern pattern = Pattern.compile("^([RNBQK])?([a-h])?([1-8])?(x)?([a-h])([1-8])([+#])?$");
   private final int TYPE = 1;
@@ -38,6 +42,7 @@ public class AlgebraicNotationParser implements Parser<String, AlgebraicNotation
 
     Matcher matcher = pattern.matcher(input);
     if (!matcher.matches()) {
+      log.error("Input [{}] does not match pattern", input);
       return null;
     }
 
