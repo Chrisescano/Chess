@@ -1,15 +1,6 @@
 package com.christian.games.chess;
 
-import static com.christian.games.piece.Color.WHITE;
-
-import com.christian.games.piece.Bishop;
-import com.christian.games.piece.Color;
-import com.christian.games.piece.King;
-import com.christian.games.piece.Knight;
-import com.christian.games.piece.Pawn;
 import com.christian.games.piece.Piece;
-import com.christian.games.piece.Queen;
-import com.christian.games.piece.Rook;
 import com.christian.games.util.Position;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +16,7 @@ public class ChessUtility {
     };
 
     List<Position> moves = new ArrayList<>();
-    for (Position direction : directionsOf(piece)) {
+    for (Position direction : piece.getDirections()) {
       for (int i = 0; i < range; i++) {
         int moveX = piece.getFile() + (direction.getX() * (i + 1));
         int moveY = piece.getRank() + (direction.getY() * (i + 1));
@@ -83,22 +74,5 @@ public class ChessUtility {
   public static boolean isOutOfBounds(final Position position) {
     return position.getX() < 0 || position.getX() > 7 ||
         position.getY() < 0 || position.getY() > 7;
-  }
-
-  /*-- Helper Methods --*/
-
-  private static List<Position> directionsOf(final Piece piece) {
-    return switch (piece.getType()) {
-      case PAWN -> {
-        Color p1Color = ((Pawn) piece).getP1Color();
-        yield piece.getColor() == WHITE ^ p1Color == WHITE ? Pawn.SOUTH_DIRECTIONS
-            : Pawn.NORTH_DIRECTIONS;
-      }
-      case ROOK -> Rook.DIRECTIONS;
-      case KNIGHT -> Knight.DIRECTIONS;
-      case BISHOP -> Bishop.DIRECTIONS;
-      case QUEEN -> Queen.DIRECTIONS;
-      case KING -> King.DIRECTIONS;
-    };
   }
 }

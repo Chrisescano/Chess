@@ -42,8 +42,6 @@ public class Fen extends BaseInitializer {
     if (pieces == null) {
       log.error("Failed to initialize - Pieces is set to null");
       throw new NullPointerException("Pieces cannot be null");
-    } else {
-      pieces.forEach(BaseInitializer::init);
     }
 
     if (activeColor == null) {

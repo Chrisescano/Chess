@@ -28,9 +28,18 @@ public class Pawn extends Piece {
     return getColor() == WHITE ? WHITE_SYMBOL : BLACK_SYMBOL;
   }
 
+  @Override
+  public List<Position> getDirections() {
+    return getColor() == WHITE ^ p1Color == WHITE ? SOUTH_DIRECTIONS : NORTH_DIRECTIONS;
+  }
+
   /*-- Getters/Setters --*/
 
   public Color getP1Color() {
     return p1Color;
+  }
+
+  public void setP1Color(final Color p1Color) {
+    this.p1Color = p1Color;
   }
 }

@@ -18,8 +18,15 @@ public class Bishop extends Piece {
     super(position, BISHOP, color);
   }
 
+  /*-- Methods --*/
+
   @Override
   public String calculateSymbol() {
     return getColor() == WHITE ? WHITE_SYMBOL : BLACK_SYMBOL;
+  }
+
+  @Override
+  public List<Position> getDirections() {
+    return DIRECTIONS;
   }
 }

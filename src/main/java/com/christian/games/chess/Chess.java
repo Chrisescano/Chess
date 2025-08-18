@@ -1,7 +1,10 @@
 package com.christian.games.chess;
 
+import static com.christian.games.piece.Type.PAWN;
+
 import com.christian.games.parser.notation.AlgebraicNotationParser;
 import com.christian.games.piece.Color;
+import com.christian.games.piece.Pawn;
 import com.christian.games.piece.Piece;
 import com.christian.games.pojo.notation.Algebraic;
 import com.christian.games.pojo.Fen;
@@ -40,6 +43,9 @@ public class Chess extends BaseInitializer implements Runnable {
   @Override
   public void doInit() {
     fen.init();
+    fen.getPieces().stream()
+        .filter(piece -> piece.getType() == PAWN)
+        .forEach(piece -> ((Pawn) piece).setP1Color(p1Color));
 
     algebraicNotationParser = new AlgebraicNotationParser();
     board = new char[BOARD_HEIGHT][BOARD_WIDTH];
@@ -90,6 +96,10 @@ public class Chess extends BaseInitializer implements Runnable {
     }
 
     /*
+    TODO LATEST:
+      (1) turn piece moves to Map<Integer, List<Position>> and fix whatever breaks
+      (2) 
+
     TODO:
       (2) work on next steps
         - some pieces have special moves:

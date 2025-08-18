@@ -24,6 +24,8 @@ public abstract class Piece extends BaseInitializer {
 
   public abstract String calculateSymbol();
 
+  public abstract List<Position> getDirections();
+
   /*-- Methods --*/
 
   @Override

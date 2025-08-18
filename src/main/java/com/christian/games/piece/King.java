@@ -23,4 +23,9 @@ public class King extends Piece {
   public String calculateSymbol() {
     return getColor() == WHITE ? WHITE_SYMBOL : BLACK_SYMBOL;
   }
+
+  @Override
+  public List<Position> getDirections() {
+    return DIRECTIONS;
+  }
 }
