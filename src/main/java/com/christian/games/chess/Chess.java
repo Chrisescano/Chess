@@ -41,11 +41,14 @@ public class Chess extends BaseInitializer implements Runnable {
   /*-- Methods --*/
 
   @Override
-  public void doInit() {
+  protected void doInit() {
     fen.init();
-    fen.getPieces().stream()
-        .filter(piece -> piece.getType() == PAWN)
-        .forEach(piece -> ((Pawn) piece).setP1Color(p1Color));
+    fen.getPieces().forEach(piece -> {
+      if (piece.getType() == PAWN) {
+        ((Pawn) piece).setMovingNorth(p1Color);
+      }
+      piece.init();
+    });
 
     algebraicNotationParser = new AlgebraicNotationParser();
     board = new char[BOARD_HEIGHT][BOARD_WIDTH];

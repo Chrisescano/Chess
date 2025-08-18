@@ -17,11 +17,13 @@ public class Pawn extends Piece {
       Position.SOUTH, Position.SOUTH_WEST, Position.SOUTH_EAST
   );
 
-  private Color p1Color;
+  private boolean isMovingNorth;
 
   public Pawn(Position position, Color color) {
     super(position, PAWN, color);
   }
+
+  /*-- Methods --*/
 
   @Override
   public String calculateSymbol() {
@@ -30,16 +32,10 @@ public class Pawn extends Piece {
 
   @Override
   public List<Position> getDirections() {
-    return getColor() == WHITE ^ p1Color == WHITE ? SOUTH_DIRECTIONS : NORTH_DIRECTIONS;
+    return isMovingNorth ? NORTH_DIRECTIONS : SOUTH_DIRECTIONS;
   }
 
-  /*-- Getters/Setters --*/
-
-  public Color getP1Color() {
-    return p1Color;
-  }
-
-  public void setP1Color(final Color p1Color) {
-    this.p1Color = p1Color;
+  public void setMovingNorth(final Color p1Color) {
+    isMovingNorth = (getColor() == WHITE) == (p1Color == WHITE);
   }
 }
