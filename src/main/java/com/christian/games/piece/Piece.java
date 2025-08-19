@@ -1,6 +1,5 @@
 package com.christian.games.piece;
 
-import com.christian.games.chess.ChessUtility;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ public abstract class Piece extends BaseInitializer {
   private List<Position> specialMoves;
   private Map<Integer, List<Position>> moveMap;
   private char charSymbol;
+  private boolean moved;
 
   public Piece(final Position position, final Type type, final Color color) {
     this.position = position;
@@ -35,7 +35,6 @@ public abstract class Piece extends BaseInitializer {
   protected void doInit() {
     specialMoves = new ArrayList<>();
     charSymbol = calculateSymbol().charAt(0);
-    ChessUtility.generateMoveMap(this);
   }
 
   public int getFile() {
@@ -60,26 +59,6 @@ public abstract class Piece extends BaseInitializer {
     return xDiff >= -1 && xDiff <= 1 && yDiff >= -1 && yDiff <= 1;
   }
 
-  public boolean moveMapContains(final Position position) {
-    for (Integer directionId : moveMap.keySet()) {
-      for (Position move : moveMap.get(directionId)) {
-        if (move.equals(position) && move.isEnabled()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  public boolean moveMapContains(final List<Position> positions) {
-    for (Position position : positions) {
-      if (moveMapContains(position)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public String toPrettyString() {
     return String.format("%s %s @ %s", color, type, position.toChessNotation());
   }
@@ -90,6 +69,8 @@ public abstract class Piece extends BaseInitializer {
         "position=" + position +
         ", type=" + type +
         ", color=" + color +
+        ", moveMap=" + moveMap +
+        ", moved=" + moved +
         '}';
   }
 
@@ -125,5 +106,13 @@ public abstract class Piece extends BaseInitializer {
 
   public char getCharSymbol() {
     return charSymbol;
+  }
+
+  public boolean isMoved() {
+    return moved;
+  }
+
+  public void setMoved(boolean moved) {
+    this.moved = moved;
   }
 }

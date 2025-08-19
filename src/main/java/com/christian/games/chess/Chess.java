@@ -11,9 +11,7 @@ import com.christian.games.pojo.Fen;
 import com.christian.games.screen.Screen;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +57,8 @@ public class Chess extends BaseInitializer implements Runnable {
     }
 
     for (Piece piece : fen.getPieces()) {
-      ChessUtility.markMoveMap(piece, board);
+      MoveManager.generateMoveMap(piece);
+      MoveManager.markMoveMap(piece, board);
     }
     running = true;
   }
@@ -77,18 +76,24 @@ public class Chess extends BaseInitializer implements Runnable {
 
       Position startPos = playerPiece.getPosition();
       Position endPos = playerMove.getEnding();
-
-      playerPiece.getPosition().update(endPos);
-      ChessUtility.updateMoveMap(playerPiece, endPos);
       board[startPos.getY()][startPos.getX()] = Character.MIN_VALUE;
       board[endPos.getY()][endPos.getX()] = playerPiece.getCharSymbol();
 
-      Set<Piece> pieces = new HashSet<>();
-      pieces.add(playerPiece);
-      pieces.addAll(fen.getPieces().stream()
-          .filter(piece -> piece.moveMapContains(List.of(startPos, endPos)))
-          .toList());
-      pieces.forEach(piece -> ChessUtility.markMoveMap(piece, board));
+      for (Piece piece : fen.getPieces()) {
+        if (piece.equals(playerPiece)) {
+          continue;
+        }
+
+        List<Position> movesContainingStart = MoveManager.getMoveMapSection(piece, startPos);
+        List<Position> movesContainingEnd = MoveManager.getMoveMapSection(piece, endPos);
+        MoveManager.markMoveMap(movesContainingStart, piece.getCharSymbol(), board);
+        if (!movesContainingStart.equals(movesContainingEnd)) {
+          MoveManager.markMoveMap(movesContainingEnd, piece.getCharSymbol(), board);
+        }
+      }
+
+      MoveManager.shiftMoveMap(playerPiece, endPos);
+      playerPiece.getPosition().update(endPos);
 
       fen.switchActiveColor();
       fen.incrementHalfMoveClock();
@@ -133,7 +138,7 @@ public class Chess extends BaseInitializer implements Runnable {
     Stream<Piece> results = fen.getPieces().stream()
         .filter(piece -> piece.getColor() == fen.getActiveColor())
         .filter(piece -> piece.getType() == notation.getType())
-        .filter(piece -> piece.moveMapContains(notation.getEnding()));
+        .filter(piece -> MoveManager.pieceMoveMapContains(piece, notation.getEnding()));
 
     Position startingPos = notation.getStarting();
     if (startingPos.getX() != -1) {
