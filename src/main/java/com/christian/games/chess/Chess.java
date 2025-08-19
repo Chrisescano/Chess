@@ -42,6 +42,9 @@ public class Chess extends BaseInitializer implements Runnable {
 
   @Override
   protected void doInit() {
+    algebraicNotationParser = new AlgebraicNotationParser();
+    board = new char[BOARD_HEIGHT][BOARD_WIDTH];
+
     fen.init();
     fen.getPieces().forEach(piece -> {
       if (piece.getType() == PAWN) {
@@ -49,9 +52,6 @@ public class Chess extends BaseInitializer implements Runnable {
       }
       piece.init();
     });
-
-    algebraicNotationParser = new AlgebraicNotationParser();
-    board = new char[BOARD_HEIGHT][BOARD_WIDTH];
 
     for (Piece piece : fen.getPieces()) {
       Position position = piece.getPosition();
@@ -61,7 +61,6 @@ public class Chess extends BaseInitializer implements Runnable {
     for (Piece piece : fen.getPieces()) {
       ChessUtility.markMoveMap(piece, board);
     }
-
     running = true;
   }
 
@@ -100,8 +99,7 @@ public class Chess extends BaseInitializer implements Runnable {
 
     /*
     TODO LATEST:
-      (1) turn piece moves to Map<Integer, List<Position>> and fix whatever breaks
-      (2) 
+
 
     TODO:
       (2) work on next steps

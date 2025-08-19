@@ -3,7 +3,9 @@ package com.christian.games.piece;
 import com.christian.games.chess.ChessUtility;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Piece extends BaseInitializer {
 
@@ -11,7 +13,8 @@ public abstract class Piece extends BaseInitializer {
   private final Type type;
   private final Color color;
 
-  private List<Position> moves;
+  private List<Position> specialMoves;
+  private Map<Integer, List<Position>> moveMap;
   private char charSymbol;
 
   public Piece(final Position position, final Type type, final Color color) {
@@ -30,6 +33,7 @@ public abstract class Piece extends BaseInitializer {
 
   @Override
   protected void doInit() {
+    specialMoves = new ArrayList<>();
     charSymbol = calculateSymbol().charAt(0);
     ChessUtility.generateMoveMap(this);
   }
@@ -57,7 +61,14 @@ public abstract class Piece extends BaseInitializer {
   }
 
   public boolean moveMapContains(final Position position) {
-    return moves.stream().anyMatch(move -> move.equals(position) && move.isEnabled());
+    for (Integer directionId : moveMap.keySet()) {
+      for (Position move : moveMap.get(directionId)) {
+        if (move.equals(position) && move.isEnabled()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public boolean moveMapContains(final List<Position> positions) {
@@ -96,12 +107,20 @@ public abstract class Piece extends BaseInitializer {
     return color;
   }
 
-  public List<Position> getMoves() {
-    return moves;
+  public List<Position> getSpecialMoves() {
+    return specialMoves;
   }
 
-  public void setMoves(List<Position> moves) {
-    this.moves = moves;
+  public void setSpecialMoves(List<Position> specialMoves) {
+    this.specialMoves = specialMoves;
+  }
+
+  public Map<Integer, List<Position>> getMoveMap() {
+    return moveMap;
+  }
+
+  public void setMoveMap(Map<Integer, List<Position>> moveMap) {
+    this.moveMap = moveMap;
   }
 
   public char getCharSymbol() {
