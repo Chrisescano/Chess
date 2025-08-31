@@ -17,7 +17,6 @@ public class MoveManager {
   /*-- Methods --*/
 
   public static void generateMoveMap(final Piece piece) {
-    log.debug("Generating move map for piece [{}]", piece);
     int range = switch (piece.getType()) {
       case PAWN, KNIGHT, KING -> 1;
       case ROOK, BISHOP, QUEEN -> 7;
@@ -34,11 +33,11 @@ public class MoveManager {
       moveMap.put(direction.toId(), moves);
     }
 
-    log.debug("Generated move map {}", moveMap);
+    log.debug("Generated move map [{}] for [{}]", moveMap, piece);
     piece.setMoveMap(moveMap);
   }
 
-  public static void shiftMoveMap(final Piece piece, final Position destination) {
+  public static void translateMoveMap(final Piece piece, final Position destination) {
     log.debug("Shifting piece [{}] move map to destination [{}]", piece, destination);
     int xDiff = destination.getX() - piece.getFile();
     int yDiff = destination.getY() - piece.getRank();
@@ -46,24 +45,26 @@ public class MoveManager {
 
     Map<Integer, List<Position>> moveMap = piece.getMoveMap();
     for (Integer directionId : moveMap.keySet()) {
-      moveMap.get(directionId).forEach(move -> move.add(diff));
+      moveMap.get(directionId).forEach(move -> move.translate(diff));
     }
   }
 
-  public static void markMoveMap(final Piece piece, final char[][] board) {
+  public static void markMoveMap(final Piece piece, final Board board) {
     log.debug("Marking move map for piece [{}]", piece);
     Map<Integer, List<Position>> moveMap = piece.getMoveMap();
     for (Integer directionId : moveMap.keySet()) {
-      markMoveMap(moveMap.get(directionId), piece.getCharSymbol(), board);
+      List<Position> moves = moveMap.get(directionId);
+      markMoveMapSection(piece.getCharSymbol(), moves, board.getSymbolsOf(moves));
     }
   }
 
-  public static void markMoveMap(final List<Position> moves, final char pieceSymbol, final char[][] board) {
-    if (!moves.isEmpty()) {
-      log.debug("Marking move map section {} for piece with symbol [{}]", moves, pieceSymbol);
-    }
+  public static void markMoveMapSection(final char pieceSymbol, final List<Position> moves, final List<Character> boardSymbols) {
+    log.debug("Marking move map section [{}] for piece with symbol [{}]", moves, pieceSymbol);
     boolean isMoveListInvalid = false;
-    for (Position move : moves) {
+    for (int i = 0; i < moves.size(); i++) {
+      Position move = moves.get(i);
+      Character boardSymbol = boardSymbols.get(i);
+
       if (isMoveListInvalid) {
         move.disable();
         continue;
@@ -76,10 +77,9 @@ public class MoveManager {
         continue;
       }
 
-      char moveToken = board[move.getY()][move.getX()];
-      if (moveToken != Character.MIN_VALUE) {
-        log.debug("Piece symbol [{}] encountered another symbol [{}] for move [{}]",pieceSymbol, moveToken, move);
-        if (areEnemies(pieceSymbol, moveToken)) {
+      if (boardSymbol != Board.EMPTY_SYMBOL) {
+        log.debug("Piece symbol [{}] encountered another symbol [{}] for move [{}]",pieceSymbol, boardSymbol, move);
+        if (areEnemies(pieceSymbol, boardSymbol)) {
           move.enable();
         } else {
           move.disable();
@@ -103,7 +103,7 @@ public class MoveManager {
   }
 
   public static boolean pieceMoveMapContains(final List<Position> moves, final Position position) {
-    log.debug("Checking if moves {} contain position [{}]", moves, position);
+    log.debug("Checking if moves [{}] contain position [{}]", moves, position);
     for (Position move : moves) {
       if (move.equals(position) && move.isEnabled()) {
         return true;

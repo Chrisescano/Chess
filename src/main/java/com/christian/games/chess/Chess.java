@@ -18,16 +18,13 @@ import org.slf4j.LoggerFactory;
 
 public class Chess extends BaseInitializer implements Runnable {
 
-  public static int BOARD_WIDTH = 8;
-  public static int BOARD_HEIGHT = 8;
-
   private static final Logger log = LoggerFactory.getLogger(Chess.class);
   private final Screen screen;
   private final Fen fen;
   private final Color p1Color;
 
   private AlgebraicNotationParser algebraicNotationParser;
-  private char[][] board;
+  private Board board;
   private boolean running;
 
   public Chess(final Screen screen, final Fen fen, final Color p1Color) {
@@ -41,25 +38,18 @@ public class Chess extends BaseInitializer implements Runnable {
   @Override
   protected void doInit() {
     algebraicNotationParser = new AlgebraicNotationParser();
-    board = new char[BOARD_HEIGHT][BOARD_WIDTH];
-
     fen.init();
-    fen.getPieces().forEach(piece -> {
+    board = fen.setUpBoard();
+
+    board.apply(piece -> {
       if (piece.getType() == PAWN) {
         ((Pawn) piece).setMovingNorth(p1Color);
       }
       piece.init();
-    });
-
-    for (Piece piece : fen.getPieces()) {
-      Position position = piece.getPosition();
-      board[position.getY()][position.getX()] = piece.getCharSymbol();
-    }
-
-    for (Piece piece : fen.getPieces()) {
       MoveManager.generateMoveMap(piece);
-      MoveManager.markMoveMap(piece, board);
-    }
+    });
+    board.apply(piece -> MoveManager.markMoveMap(piece, board));
+
     running = true;
   }
 
@@ -70,30 +60,27 @@ public class Chess extends BaseInitializer implements Runnable {
       Piece playerPiece = refineSearchResults(searchPiece(playerMove));
 
       if (playerPiece == null) {
+        screen.pushNotification("No piece found please try again");
         continue; //bad input or no piece exists w/ input
       }
       log.debug("Player wants to move the following piece [{}]", playerPiece);
 
-      Position startPos = playerPiece.getPosition();
-      Position endPos = playerMove.getEnding();
-      board[startPos.getY()][startPos.getX()] = Character.MIN_VALUE;
-      board[endPos.getY()][endPos.getX()] = playerPiece.getCharSymbol();
+      Position oldPos = playerPiece.getPosition();
+      Position newPos = playerMove.getEnding();
 
-      for (Piece piece : fen.getPieces()) {
-        if (piece.equals(playerPiece)) {
-          continue;
+      board.apply(piece -> {
+        if (!piece.equals(playerPiece)) {
+          List<Position> sectionWithStart = MoveManager.getMoveMapSection(piece, oldPos);
+          List<Position> sectionWithEnd = MoveManager.getMoveMapSection(piece, newPos);
+          MoveManager.markMoveMapSection(piece.getCharSymbol(), sectionWithStart, board.getSymbolsOf(sectionWithStart));
+          if (!sectionWithStart.equals(sectionWithEnd)) {
+            MoveManager.markMoveMapSection(piece.getCharSymbol(), sectionWithEnd, board.getSymbolsOf(sectionWithEnd));
+          }
         }
+      });
 
-        List<Position> movesContainingStart = MoveManager.getMoveMapSection(piece, startPos);
-        List<Position> movesContainingEnd = MoveManager.getMoveMapSection(piece, endPos);
-        MoveManager.markMoveMap(movesContainingStart, piece.getCharSymbol(), board);
-        if (!movesContainingStart.equals(movesContainingEnd)) {
-          MoveManager.markMoveMap(movesContainingEnd, piece.getCharSymbol(), board);
-        }
-      }
-
-      MoveManager.shiftMoveMap(playerPiece, endPos);
-      playerPiece.getPosition().update(endPos);
+      MoveManager.translateMoveMap(playerPiece, newPos);
+      board.updatePiece(playerPiece, newPos);
 
       fen.switchActiveColor();
       fen.incrementHalfMoveClock();
@@ -135,22 +122,21 @@ public class Chess extends BaseInitializer implements Runnable {
   }
 
   private List<Piece> searchPiece(final Algebraic notation) {
-    Stream<Piece> results = fen.getPieces().stream()
-        .filter(piece -> piece.getColor() == fen.getActiveColor())
-        .filter(piece -> piece.getType() == notation.getType())
-        .filter(piece -> MoveManager.pieceMoveMapContains(piece, notation.getEnding()));
+    Stream<Piece> searchResults = board.searchFor(
+        piece -> piece.getColor() == fen.getActiveColor() &&
+        piece.getType() == notation.getType() && MoveManager.pieceMoveMapContains(piece, notation.getEnding()));
 
     Position startingPos = notation.getStarting();
     if (startingPos.getX() != -1) {
-      results = results.filter(piece -> piece.getFile() == startingPos.getX());
+      searchResults = searchResults.filter(piece -> piece.getFile() == startingPos.getX());
     }
 
     if (startingPos.getY() != -1) {
-      results = results.filter(piece -> piece.getRank() == startingPos.getY());
+      searchResults = searchResults.filter(piece -> piece.getRank() == startingPos.getY());
     }
 
-    log.debug("Search criteria: [{}] resulted in {}", notation, results);
-    return results.toList();
+    log.debug("Search criteria: [{}] resulted in {}", notation, searchResults);
+    return searchResults.toList();
   }
 
   private Piece refineSearchResults(final List<Piece> results) {

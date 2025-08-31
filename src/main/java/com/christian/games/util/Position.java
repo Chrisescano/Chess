@@ -38,19 +38,19 @@ public class Position {
   public static Position combine(final Position... positions) {
     Position result = new Position(0, 0);
     for (Position position : positions) {
-      result.add(position);
+      result.translate(position);
     }
     return result;
   }
 
-  public void add(final Position position) {
+  public void translate(final Position position) {
     if (!locked) {
       x += position.x;
       y += position.y;
     }
   }
 
-  public void update(final Position position) {
+  public void set(final Position position) {
     if (!locked) {
       x = position.x;
       y = position.y;

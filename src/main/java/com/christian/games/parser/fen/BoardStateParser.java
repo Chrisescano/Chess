@@ -3,6 +3,7 @@ package com.christian.games.parser.fen;
 import static com.christian.games.piece.Color.BLACK;
 import static com.christian.games.piece.Color.WHITE;
 
+import com.christian.games.chess.Board;
 import com.christian.games.parser.Parser;
 import com.christian.games.piece.Bishop;
 import com.christian.games.piece.King;
@@ -12,29 +13,29 @@ import com.christian.games.piece.Pawn;
 import com.christian.games.piece.Queen;
 import com.christian.games.piece.Rook;
 import com.christian.games.util.Position;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BoardStateParser implements Parser<String, List<Piece>> {
+public class BoardStateParser implements Parser<String, Board> {
 
   private static final Logger log = LoggerFactory.getLogger(BoardStateParser.class);
 
   private static final char SLASH = '/';
 
   @Override
-  public List<Piece> parse(String input) {
+  public Board parse(String input) {
     if (input == null) {
       return null;
     }
 
-    log.info("Parsing input {}", input);
-    List<Piece> pieces = new ArrayList<>();
+    log.info("Parsing input [{}]", input);
+    Set<Piece> pieces = new HashSet<>();
     int file = 0, rank = 0, total = 0;
     for (char token : input.toCharArray()) {
-      Piece piece;
-      if ((piece = toPiece(token, file, rank)) != null) {
+      Piece piece = toPiece(token, file, rank);
+      if (piece != null) {
         pieces.add(piece);
         file++;
         total++;
@@ -50,16 +51,20 @@ public class BoardStateParser implements Parser<String, List<Piece>> {
         break;
       }
     }
+
     if (total == 64) {
-      return pieces;
-    } else {
-      log.error("Input accounted for [{}] tiles instead of 64", total);
-      return null;
+      Board board = new Board();
+      board.init();
+      pieces.forEach(board::placePiece);
+      return board;
     }
+
+    log.error("Input accounted for [{}] tiles instead of 64", total);
+    return null;
   }
 
   @Override
-  public String unparse(List<Piece> input) {
+  public String unparse(Board input) {
     return "";
   }
 

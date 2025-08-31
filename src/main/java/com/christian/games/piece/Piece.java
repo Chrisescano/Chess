@@ -5,6 +5,7 @@ import com.christian.games.util.Position;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class Piece extends BaseInitializer {
 
@@ -14,6 +15,7 @@ public abstract class Piece extends BaseInitializer {
 
   private List<Position> specialMoves;
   private Map<Integer, List<Position>> moveMap;
+  private int id;
   private char charSymbol;
   private boolean moved;
 
@@ -35,6 +37,7 @@ public abstract class Piece extends BaseInitializer {
   protected void doInit() {
     specialMoves = new ArrayList<>();
     charSymbol = calculateSymbol().charAt(0);
+    id = position.toId();
   }
 
   public int getFile() {
@@ -61,6 +64,20 @@ public abstract class Piece extends BaseInitializer {
 
   public String toPrettyString() {
     return String.format("%s %s @ %s", color, type, position.toChessNotation());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Piece piece)) {
+      return false;
+    }
+    return Objects.equals(position, piece.position) && type == piece.type
+        && color == piece.color;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(position, type, color);
   }
 
   @Override
@@ -114,5 +131,9 @@ public abstract class Piece extends BaseInitializer {
 
   public void setMoved(boolean moved) {
     this.moved = moved;
+  }
+
+  public int getId() {
+    return id;
   }
 }

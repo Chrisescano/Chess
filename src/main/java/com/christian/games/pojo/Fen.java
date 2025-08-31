@@ -3,11 +3,10 @@ package com.christian.games.pojo;
 import static com.christian.games.piece.Color.BLACK;
 import static com.christian.games.piece.Color.WHITE;
 
+import com.christian.games.chess.Board;
 import com.christian.games.piece.Color;
-import com.christian.games.piece.Piece;
 import com.christian.games.util.BaseInitializer;
 import com.christian.games.util.Position;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,16 +17,16 @@ public class Fen extends BaseInitializer {
 
   private static final Logger log = LoggerFactory.getLogger(Fen.class);
 
-  private final List<Piece> pieces;
+  private final Board board;
   private Color activeColor;
   private boolean[] castlingRights;
   private Position enPassant;
   private Integer halfMoveClock;
   private Integer fullMoveCounter;
 
-  public Fen(final List<Piece> pieces, final Color activeColor, final boolean[] castlingRights,
+  public Fen(final Board board, final Color activeColor, final boolean[] castlingRights,
       final Position enPassant, final Integer halfMoveClock, final Integer fullMoveCounter) {
-    this.pieces = pieces;
+    this.board = board;
     this.activeColor = activeColor;
     this.castlingRights = castlingRights;
     this.enPassant = enPassant;
@@ -39,9 +38,9 @@ public class Fen extends BaseInitializer {
 
   @Override
   public void doInit() {
-    if (pieces == null) {
-      log.error("Failed to initialize - Pieces is set to null");
-      throw new NullPointerException("Pieces cannot be null");
+    if (board == null) {
+      log.error("Failed to initialize - Board is set to null");
+      throw new NullPointerException("Board cannot be null");
     }
 
     if (activeColor == null) {
@@ -71,6 +70,11 @@ public class Fen extends BaseInitializer {
     }
   }
 
+  public Board setUpBoard() {
+    board.init();
+    return board;
+  }
+
   public void switchActiveColor() {
     activeColor = activeColor == WHITE ? BLACK : WHITE;
   }
@@ -84,10 +88,6 @@ public class Fen extends BaseInitializer {
   }
 
   /*-- Getters/Setters --*/
-
-  public List<Piece> getPieces() {
-    return pieces;
-  }
 
   public Color getActiveColor() {
     return activeColor;
