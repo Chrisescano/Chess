@@ -55,11 +55,21 @@ public class MoveManager {
   }
 
   public static void enableListOfMoves(final char pieceSymbol, final Position piecePos, final List<Position> moves, final List<Character> boardSymbols) {
+    boolean isMovesEligible = true;
     for (int i = 0; i < moves.size(); i++) {
       Position move = moves.get(i);
       Character boardSymbol = boardSymbols.get(i);
-      boolean eligibility = isMoveEligible(piecePos, move, pieceSymbol, boardSymbol);
-      move.setEnabled(eligibility);
+
+      if (!isMovesEligible) {
+        move.disable();
+        continue;
+      }
+
+      boolean eligible = isMoveEligible(piecePos, move, pieceSymbol, boardSymbol);
+      if (!eligible) {
+        isMovesEligible = false;
+      }
+      move.setEnabled(eligible);
     }
   }
 
