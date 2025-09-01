@@ -40,26 +40,26 @@ public abstract class Piece extends BaseInitializer {
     id = position.toId();
   }
 
+  public boolean moveMapContains(final Position position) {
+    return getMovesThatContain(position) != null;
+  }
+
+  public List<Position> getMovesThatContain(final Position position) {
+    for (final Map.Entry<Integer, List<Position>> entry : moveMap.entrySet()) {
+      final List<Position> moves = entry.getValue();
+      if (moves.contains(position)) {
+        return moves;
+      }
+    }
+    return null;
+  }
+
   public int getFile() {
     return position.getX();
   }
 
   public int getRank() {
     return position.getY();
-  }
-
-  public boolean isEnemyOf(final Piece piece) {
-    return isEnemyOf(piece.getCharSymbol());
-  }
-
-  public boolean isEnemyOf(final char symbol) {
-    return Character.isUpperCase(charSymbol) ^ Character.isUpperCase(symbol);
-  }
-
-  public boolean isOneTileAwayFrom(final Position position) {
-    int xDiff = position.getX() - this.position.getX();
-    int yDiff = position.getY() - this.position.getY();
-    return xDiff >= -1 && xDiff <= 1 && yDiff >= -1 && yDiff <= 1;
   }
 
   public String toPrettyString() {

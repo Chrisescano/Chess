@@ -86,12 +86,12 @@ public class Position {
     if (!(o instanceof Position position)) {
       return false;
     }
-    return x == position.x && y == position.y;
+    return x == position.x && y == position.y && enabled == position.enabled;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(x, y);
+    return Objects.hash(x, y, enabled);
   }
 
   @Override
@@ -99,6 +99,7 @@ public class Position {
     return "Position{" +
         "x=" + x +
         ", y=" + y +
+        ", enabled=" + enabled +
         '}';
   }
 
@@ -130,5 +131,9 @@ public class Position {
 
   public boolean isEnabled() {
     return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }
