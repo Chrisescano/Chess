@@ -68,7 +68,6 @@ public class Board extends BaseInitializer {
     if (pieceId == getPieceId(oldPosition)) {
       markBoard(oldPosition, NO_PIECE);
       markBoard(newPosition, pieceId);
-      oldPosition.set(newPosition);
     }
   }
 

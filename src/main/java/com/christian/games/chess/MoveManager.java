@@ -46,15 +46,15 @@ public class MoveManager {
     }
   }
 
-  public static void enableMoveMap(final Piece piece, final Board board) {
+  public static void updateMoveMap(final Piece piece, final Board board) {
     Map<Integer, List<Position>> moveMap = piece.getMoveMap();
     for (Integer directionId : moveMap.keySet()) {
       List<Position> moves = moveMap.get(directionId);
-      enableListOfMoves(piece.getCharSymbol(), piece.getPosition(), moves, board.getSymbolsOf(moves));
+      updateListOfMoves(piece.getCharSymbol(), piece.getPosition(), moves, board.getSymbolsOf(moves));
     }
   }
 
-  public static void enableListOfMoves(final char pieceSymbol, final Position piecePos, final List<Position> moves, final List<Character> boardSymbols) {
+  public static void updateListOfMoves(final char pieceSymbol, final Position piecePos, final List<Position> moves, final List<Character> boardSymbols) {
     boolean isMovesEligible = true;
     for (int i = 0; i < moves.size(); i++) {
       Position move = moves.get(i);

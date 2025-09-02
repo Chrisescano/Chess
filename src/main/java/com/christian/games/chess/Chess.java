@@ -48,7 +48,7 @@ public class Chess extends BaseInitializer implements Runnable {
       piece.init();
       MoveManager.setUpMoveMap(piece);
     });
-    board.apply(piece -> MoveManager.enableMoveMap(piece, board));
+    board.apply(piece -> MoveManager.updateMoveMap(piece, board));
 
     running = true;
   }
@@ -68,6 +68,11 @@ public class Chess extends BaseInitializer implements Runnable {
       Position oldPos = playerPiece.getPosition();
       Position newPos = playerMove.getEnding();
 
+      MoveManager.translateMoveMap(playerPiece, newPos);
+      playerPiece.getPosition().set(newPos);
+      MoveManager.updateMoveMap(playerPiece, board);
+      board.updatePiece(playerPiece, newPos);
+
       board.searchFor(piece -> {
         if (piece.equals(playerPiece)) {
           return false;
@@ -78,15 +83,12 @@ public class Chess extends BaseInitializer implements Runnable {
         List<Position> movesWithNew = piece.getMovesThatContain(newPos);
 
         if (movesWithOld != null) {
-          MoveManager.enableListOfMoves(piece.getCharSymbol(), piece.getPosition(), movesWithOld, board.getSymbolsOf(movesWithOld));
+          MoveManager.updateListOfMoves(piece.getCharSymbol(), piece.getPosition(), movesWithOld, board.getSymbolsOf(movesWithOld));
         }
         if (movesWithNew != null) {
-          MoveManager.enableListOfMoves(piece.getCharSymbol(), piece.getPosition(), movesWithNew, board.getSymbolsOf(movesWithNew));
+          MoveManager.updateListOfMoves(piece.getCharSymbol(), piece.getPosition(), movesWithNew, board.getSymbolsOf(movesWithNew));
         }
       });
-
-      MoveManager.translateMoveMap(playerPiece, newPos);
-      board.updatePiece(playerPiece, newPos);
 
       fen.switchActiveColor();
       fen.incrementHalfMoveClock();
@@ -128,8 +130,8 @@ public class Chess extends BaseInitializer implements Runnable {
   }
 
   private List<Piece> searchPiece(final Algebraic notation) {
-    Stream<Piece> searchResults = board.searchFor(
-        piece -> piece.getColor() == fen.getActiveColor() &&
+    Stream<Piece> searchResults = board.searchFor(piece ->
+        piece.getColor() == fen.getActiveColor() &&
         piece.getType() == notation.getType() && piece.moveMapContains(notation.getEnding()));
 
     Position startingPos = notation.getStarting();
