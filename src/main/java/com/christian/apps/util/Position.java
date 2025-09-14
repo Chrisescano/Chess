@@ -10,6 +10,21 @@ public class Position {
     this.y = y;
   }
 
+  /*-- Methods --*/
+
+  public void setTo(final Position position) {
+    x = position.x;
+    y = position.y;
+  }
+
+  @Override
+  public String toString() {
+    return "Position{" +
+        "x=" + x +
+        ", y=" + y +
+        '}';
+  }
+
   /*-- Getters/Setters --*/
 
   public int getX() {
