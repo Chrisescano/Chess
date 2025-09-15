@@ -1,6 +1,7 @@
 package com.christian.apps.piece;
 
 import com.christian.apps.util.Position;
+import java.util.List;
 
 public class Bishop extends Piece {
 
@@ -10,5 +11,12 @@ public class Bishop extends Piece {
   public Bishop(Position position, boolean isWhite) {
     super(position, Type.BISHOP, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
+  }
+
+  /*-- Methods --*/
+
+  @Override
+  public List<Position> getDirections() {
+    return List.of(Position.NORTH_EAST, Position.SOUTH_EAST, Position.SOUTH_WEST, Position.NORTH_WEST);
   }
 }

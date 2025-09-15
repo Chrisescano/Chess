@@ -1,6 +1,10 @@
 package com.christian.apps.piece;
 
+import com.christian.apps.chess.Board;
 import com.christian.apps.util.Position;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class Piece {
 
@@ -9,11 +13,17 @@ public abstract class Piece {
   private final boolean isWhite;
   private char symbol;
 
+  private final List<List<Position>> potentialMoves = new ArrayList<>();
+
   public Piece(final Position position, final Type type, final boolean isWhite) {
     this.position = position;
     this.type = type;
     this.isWhite = isWhite;
   }
+
+  /*-- Abstract Methods --*/
+
+  public abstract List<Position> getDirections();
 
   /*-- Methods --*/
 
@@ -33,6 +43,36 @@ public abstract class Piece {
       case King.BLACK_SYMBOL -> new King(position, false);
       default -> null;
     };
+  }
+
+  public static boolean areEnemies(final char symA, final char symB) {
+    if (symA == Board.EMPTY_TILE || symB == Board.EMPTY_TILE) {
+      return false;
+    }
+    return Character.isUpperCase(symA) ^ Character.isUpperCase(symB);
+  }
+
+  public List<Position> pathThatContains(final Position position) {
+    for (final List<Position> path : potentialMoves) {
+      if (path.contains(position)) {
+        return path;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Piece piece)) {
+      return false;
+    }
+    return isWhite == piece.isWhite && Objects.equals(position, piece.position)
+        && type == piece.type;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(position, type, isWhite);
   }
 
   /*-- Getters/Setters --*/
@@ -55,5 +95,9 @@ public abstract class Piece {
 
   protected void setSymbol(char symbol) {
     this.symbol = symbol;
+  }
+
+  public List<List<Position>> getPotentialMoves() {
+    return potentialMoves;
   }
 }
