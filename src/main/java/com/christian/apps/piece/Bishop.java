@@ -9,7 +9,7 @@ public class Bishop extends Piece {
   public static final char BLACK_SYMBOL = 'b';
 
   public Bishop(Position position, boolean isWhite) {
-    super(position, Type.BISHOP, isWhite);
+    super(position, PieceType.BISHOP, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
   }
 

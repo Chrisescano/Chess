@@ -9,7 +9,7 @@ public class Rook extends Piece {
   public static final char BLACK_SYMBOL = 'r';
 
   public Rook(final Position position, final boolean isWhite) {
-    super(position, Type.ROOK, isWhite);
+    super(position, PieceType.ROOK, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
   }
 

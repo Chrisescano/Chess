@@ -9,7 +9,7 @@ public class Knight extends Piece {
   public static final char BLACK_SYMBOL = 'n';
 
   public Knight(Position position, boolean isWhite) {
-    super(position, Type.KNIGHT, isWhite);
+    super(position, PieceType.KNIGHT, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
   }
 

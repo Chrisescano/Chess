@@ -9,7 +9,7 @@ public class Pawn extends Piece {
   public static final char BLACK_SYMBOL = 'p';
 
   public Pawn(Position position, boolean isWhite) {
-    super(position, Type.PAWN, isWhite);
+    super(position, PieceType.PAWN, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
   }
 
