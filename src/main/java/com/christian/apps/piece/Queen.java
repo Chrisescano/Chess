@@ -9,7 +9,7 @@ public class Queen extends Piece {
   public static final char BLACK_SYMBOL = 'q';
 
   public Queen(Position position, boolean isWhite) {
-    super(position, Type.QUEEN, isWhite);
+    super(position, PieceType.QUEEN, isWhite);
     setSymbol(isWhite ? WHITE_SYMBOL : BLACK_SYMBOL);
   }
 

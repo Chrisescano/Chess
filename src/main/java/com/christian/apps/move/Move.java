@@ -22,7 +22,7 @@ public class Move {
   /*-- Inner Class --*/
 
   public enum MoveType {
-    MOVE, CAPTURE
+    MOVE, CAPTURE, DOUBLE_JUMP
   }
 
   /*-- Methods --*/

@@ -1,5 +1,5 @@
 package com.christian.apps.piece;
 
-public enum Type {
+public enum PieceType {
   PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING
 }

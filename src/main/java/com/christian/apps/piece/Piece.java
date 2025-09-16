@@ -9,13 +9,14 @@ import java.util.Objects;
 public abstract class Piece {
 
   private final Position position;
-  private final Type type;
+  private final PieceType type;
   private final boolean isWhite;
+  private int moveCounter = 0;
   private char symbol;
 
   private final List<List<Position>> potentialMoves = new ArrayList<>();
 
-  public Piece(final Position position, final Type type, final boolean isWhite) {
+  public Piece(final Position position, final PieceType type, final boolean isWhite) {
     this.position = position;
     this.type = type;
     this.isWhite = isWhite;
@@ -61,6 +62,10 @@ public abstract class Piece {
     return null;
   }
 
+  public void incrementMoveCounter() {
+    moveCounter++;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Piece piece)) {
@@ -81,12 +86,16 @@ public abstract class Piece {
     return position;
   }
 
-  public Type getType() {
+  public PieceType getType() {
     return type;
   }
 
   public boolean isWhite() {
     return isWhite;
+  }
+
+  public int getMoveCounter() {
+    return moveCounter;
   }
 
   public char getSymbol() {

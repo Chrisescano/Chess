@@ -3,7 +3,7 @@ package com.christian.apps.move;
 import com.christian.apps.chess.Board;
 import com.christian.apps.move.Move.MoveType;
 import com.christian.apps.piece.Piece;
-import com.christian.apps.piece.Type;
+import com.christian.apps.piece.PieceType;
 import com.christian.apps.util.Position;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,28 +52,40 @@ public class MoveManager {
       return null;
     }
 
+    MoveType moveType = null;
     List<Position> path = piece.pathThatContains(destination);
     if (path != null) {
-      final char[] boardSyms = board.getRangeOfTiles(path);
-      boolean lastMoveLegal = true;
+      final char[] boardSyms = board.getRangeOfTiles(path); //TODO: filter out of bounds pos or else AIOOB exception
+      boolean isLastMoveLegal = true;
 
       for (int i = 0; i < boardSyms.length; i++) {
-        if (!lastMoveLegal) {
+        if (!isLastMoveLegal) {
           return null;
         }
 
         final Position potentialMove = path.get(i);
-        final MoveType moveType = getMoveType(piece, potentialMove, boardSyms[i]);
+        moveType = getMoveType(piece, potentialMove, boardSyms[i]);
 
         if (potentialMove.equals(destination)) {
           return moveType;
         } else if (moveType != MoveType.MOVE) {
-          lastMoveLegal = false;
+          isLastMoveLegal = false;
         }
       }
     }
 
     //TODO - if path is null - check for special move
+    if (piece.getType() == PieceType.PAWN) {
+      moveType = checkForDoubleJump(piece, destination);
+
+      //TODO - check for enpassant
+    }
+
+    //TODO - check for king castle
+    if (piece.getType() == PieceType.KING) {
+      //fill in logic here
+    }
+
     return null;
   }
 
@@ -112,8 +124,20 @@ public class MoveManager {
     }
   }
 
+  private MoveType checkForDoubleJump(final Piece piece, final Position destination) {
+    final int moveCounter = piece.getMoveCounter();
+    final Position piecePos = piece.getPosition();
+    final int yDiff = Math.abs(destination.getY() - piecePos.getY());
+
+    if (moveCounter == 0 && piecePos.getX() == destination.getX() && yDiff == 2) {
+      return MoveType.DOUBLE_JUMP;
+    }
+
+    return null;
+  }
+
   private MoveType getMoveType(final Piece piece, final Position destination, final char boardSym) {
-    if (piece.getType() == Type.PAWN) {
+    if (piece.getType() == PieceType.PAWN) {
       return getPawnMoveType(piece.getSymbol(), piece.getPosition(), boardSym, destination);
     }
     return getRegMoveType(piece.getSymbol(), boardSym);
