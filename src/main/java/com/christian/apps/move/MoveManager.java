@@ -13,17 +13,20 @@ import org.slf4j.LoggerFactory;
 public class MoveManager {
 
   private static final Logger log = LoggerFactory.getLogger(MoveManager.class);
-
   private static final int NOT_PAWN_MOVE = -1;
   private static final int FORWARD_PAWN_MOVE = 0;
   private static final int SIDE_PAWN_MOVE = 1;
 
   private final Board board;
   private final List<Move> moveLedger;
-  private int moveNumber = 1;
 
-  public MoveManager(final Board board) {
+  private Position enPassantPosition;
+  private int moveNumber = 1;
+  private int enPassantTTL = 0;
+
+  public MoveManager(final Board board, final Position enPassantPosition) {
     this.board = board;
+    this.enPassantPosition = enPassantPosition;
     moveLedger = new ArrayList<>();
   }
 
@@ -78,7 +81,11 @@ public class MoveManager {
     if (piece.getType() == PieceType.PAWN) {
       moveType = checkForDoubleJump(piece, destination);
 
-      //TODO - check for enpassant
+      if (moveType == null) {
+        moveType = checkForEnPassant(destination);
+      }
+
+      return moveType;
     }
 
     //TODO - check for king castle
@@ -103,6 +110,7 @@ public class MoveManager {
       board.placeSymbolAt(destination, pieceSym);
       translatePotentialMoves(piece.getPotentialMoves(), piecePosition, destination);
       piecePosition.setTo(destination);
+      piece.incrementMoveCounter();
       moveNumber++;
       return true;
     }
@@ -110,6 +118,14 @@ public class MoveManager {
     log.warn("Could not move piece - board contained [{}] at {} instead of [{}]",
         boardSym, piecePosition, pieceSym);
     return false;
+  }
+
+  public void setUpForNextMove() {
+    if (enPassantTTL == 0 && enPassantPosition != null) {
+      enPassantPosition = null;
+    } else if (enPassantTTL == 1) {
+      enPassantTTL--;
+    }
   }
 
   /*-- Helper Methods --*/
@@ -125,12 +141,23 @@ public class MoveManager {
   }
 
   private MoveType checkForDoubleJump(final Piece piece, final Position destination) {
-    final int moveCounter = piece.getMoveCounter();
-    final Position piecePos = piece.getPosition();
-    final int yDiff = Math.abs(destination.getY() - piecePos.getY());
+    if (piece.getMoveCounter() == 0 && isPawnDoubleJump(piece.getPosition(), destination)) {
+      final Position singleMove = new Position(destination.getX(), destination.getY() + (piece.isWhite() ? 1 : -1));
+      if (board.getTile(singleMove) == Board.EMPTY_TILE) {
+        return MoveType.DOUBLE_JUMP;
+      }
+    }
 
-    if (moveCounter == 0 && piecePos.getX() == destination.getX() && yDiff == 2) {
-      return MoveType.DOUBLE_JUMP;
+    return null;
+  }
+
+  private MoveType checkForEnPassant(final Position destination) {
+    if (enPassantPosition == null) {
+      return null;
+    }
+
+    if (destination.equals(enPassantPosition)) {
+      return MoveType.EN_PASSANT;
     }
 
     return null;
@@ -177,6 +204,13 @@ public class MoveManager {
       return SIDE_PAWN_MOVE;
     }
     return NOT_PAWN_MOVE;
+  }
+
+  public boolean isPawnDoubleJump(final Position posA, final Position posB) {
+    if (Math.abs(posA.getY() - posB.getY()) == 2) {
+      return posA.getX() == posB.getX();
+    }
+    return false;
   }
 
   /*-- Getters/Setters --*/
