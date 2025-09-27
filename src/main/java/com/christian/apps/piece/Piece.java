@@ -53,6 +53,15 @@ public abstract class Piece {
     return Character.isUpperCase(symA) ^ Character.isUpperCase(symB);
   }
 
+  public boolean doesPotentialMovesContain(final List<Position> positions) {
+    for (Position position : positions) {
+      if (pathThatContains(position) != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public List<Position> pathThatContains(final Position position) {
     for (final List<Position> path : potentialMoves) {
       if (path.contains(position)) {

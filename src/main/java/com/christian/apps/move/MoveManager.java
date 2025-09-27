@@ -4,25 +4,40 @@ import com.christian.apps.chess.Board;
 import com.christian.apps.move.Move.MoveType;
 import com.christian.apps.piece.Piece;
 import com.christian.apps.piece.PieceType;
+import com.christian.apps.piece.Rook;
 import com.christian.apps.util.Position;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MoveManager {
 
   private static final Logger log = LoggerFactory.getLogger(MoveManager.class);
-  private static final int NOT_PAWN_MOVE = -1;
+  private static final int NOT_VALID_MOVE = -1;
   private static final int FORWARD_PAWN_MOVE = 0;
   private static final int SIDE_PAWN_MOVE = 1;
+  private static final int BLACK_QUEEN_SIDE = 0;
+  private static final int BLACK_KING_SIDE = 1;
+  private static final int WHITE_QUEEN_SIDE = 2;
+  private static final int WHITE_KING_SIDE = 3;
+
+  private static final Map<Position, Position> castlingMap = Map.of(
+      new Position(2, 0), Rook.TOP_LEFT,    //BLACK_QUEEN_CASTLING_POS
+      new Position(6, 0), Rook.TOP_RIGHT,   //BLACK_KING_CASTLING_POS
+      new Position(2, 7), Rook.BOTTOM_LEFT, //WHITE_QUEEN_CASTLING_POS
+      new Position(6, 7), Rook.BOTTOM_RIGHT //WHITE_KING_CASTLING_POS
+  );
 
   private final Board board;
   private final List<Move> moveLedger;
-
   private Position enPassantPosition;
   private int moveNumber = 1;
   private int enPassantTTL = 0;
+  private boolean isWhiteKingInCheck;
+  private boolean isBlackKingInCheck;
 
   public MoveManager(final Board board, final Position enPassantPosition) {
     this.board = board;
@@ -49,6 +64,16 @@ public class MoveManager {
     }
   }
 
+  public boolean isMoveEligible(final Position destination) {
+    final int destinationX = Math.abs(destination.getX());
+    final int destinationY = Math.abs(destination.getY());
+
+    if (destinationX == 2 || destinationY == 0) {
+      return true;
+    }
+    return destinationX > 1 || destinationY > 2;
+  }
+
   public MoveType processMove(final Piece piece, final Position destination) {
     if (piece == null || Board.isOutOfBounds(destination)) {
       log.error("Piece is null or destination: [{}] is out of bounds", destination);
@@ -58,7 +83,8 @@ public class MoveManager {
     MoveType moveType = null;
     List<Position> path = piece.pathThatContains(destination);
     if (path != null) {
-      final char[] boardSyms = board.getRangeOfTiles(path); //TODO: filter out of bounds pos or else AIOOB exception
+      //TODO: filter out of bounds pos or else AIOOB exception
+      final char[] boardSyms = board.getRangeOfTiles(path);
       boolean isLastMoveLegal = true;
 
       for (int i = 0; i < boardSyms.length; i++) {
@@ -77,23 +103,19 @@ public class MoveManager {
       }
     }
 
-    //TODO - if path is null - check for special move
     if (piece.getType() == PieceType.PAWN) {
       moveType = checkForDoubleJump(piece, destination);
-
       if (moveType == null) {
         moveType = checkForEnPassant(destination);
       }
-
       return moveType;
     }
 
-    //TODO - check for king castle
     if (piece.getType() == PieceType.KING) {
-      //fill in logic here
+      return checkForCastling(piece, destination);
     }
 
-    return null;
+    return moveType;
   }
 
   public void logMove() {
@@ -102,21 +124,12 @@ public class MoveManager {
 
   public boolean movePiece(final Piece piece, final Position destination) {
     final Position piecePosition = piece.getPosition();
-    final char boardSym = board.getTile(piecePosition);
-    final char pieceSym = piece.getSymbol();
-
-    if (boardSym == pieceSym) {
-      board.removeSymbolAt(piecePosition);
-      board.placeSymbolAt(destination, pieceSym);
+    if (board.movePiece(piece, destination)) {
       translatePotentialMoves(piece.getPotentialMoves(), piecePosition, destination);
-      piecePosition.setTo(destination);
       piece.incrementMoveCounter();
       moveNumber++;
       return true;
     }
-
-    log.warn("Could not move piece - board contained [{}] at {} instead of [{}]",
-        boardSym, piecePosition, pieceSym);
     return false;
   }
 
@@ -142,7 +155,8 @@ public class MoveManager {
 
   private MoveType checkForDoubleJump(final Piece piece, final Position destination) {
     if (piece.getMoveCounter() == 0 && isPawnDoubleJump(piece.getPosition(), destination)) {
-      final Position singleMove = new Position(destination.getX(), destination.getY() + (piece.isWhite() ? 1 : -1));
+      final Position singleMove = new Position(destination.getX(),
+          destination.getY() + (piece.isWhite() ? 1 : -1));
       if (board.getTile(singleMove) == Board.EMPTY_TILE) {
         return MoveType.DOUBLE_JUMP;
       }
@@ -155,12 +169,35 @@ public class MoveManager {
     if (enPassantPosition == null) {
       return null;
     }
-
     if (destination.equals(enPassantPosition)) {
       return MoveType.EN_PASSANT;
     }
-
     return null;
+  }
+
+  private MoveType checkForCastling(final Piece piece, final Position destination) {
+    Piece rook = getRookForCastling(destination);
+
+    if (piece.getMoveCounter() > 0 || rook == null || rook.getMoveCounter() > 0
+        || isWhiteKingInCheck || isBlackKingInCheck) {
+      return null;
+    }
+
+    List<Position> castlingPath = getCastlingPath(piece.getPosition(), destination);
+    for (char boardSym : board.getRangeOfTiles(castlingPath)) {
+      if (boardSym != Board.EMPTY_TILE) {
+        return null;
+      }
+    }
+
+    return board.searchFor(!piece.isWhite())
+        .filter(enemyPiece -> enemyPiece.doesPotentialMovesContain(castlingPath))
+        .toList().isEmpty() ? MoveType.CASTLING : null;
+  }
+
+  private List<Position> getCastlingPath(final Position start, final Position end) {
+    return List.of(new Position(start.getX() + start.getX() < end.getX() ? 1 : -1, start.getY()),
+        end);
   }
 
   private MoveType getMoveType(final Piece piece, final Position destination, final char boardSym) {
@@ -196,17 +233,26 @@ public class MoveManager {
     return null;
   }
 
-  public int isForwardPawnMove(final Position posA, final Position posB) {
+  private Piece getRookForCastling(final Position destination) {
+    for (Position castlingSide : castlingMap.keySet()) {
+      if (destination.equals(castlingSide)) {
+        return board.getPiece(castlingMap.get(castlingSide));
+      }
+    }
+    return null;
+  }
+
+  private int isForwardPawnMove(final Position posA, final Position posB) {
     if (Math.abs(posA.getY() - posB.getY()) == 1) {
       if (posA.getX() == posB.getX()) {
         return FORWARD_PAWN_MOVE;
       }
       return SIDE_PAWN_MOVE;
     }
-    return NOT_PAWN_MOVE;
+    return NOT_VALID_MOVE;
   }
 
-  public boolean isPawnDoubleJump(final Position posA, final Position posB) {
+  private boolean isPawnDoubleJump(final Position posA, final Position posB) {
     if (Math.abs(posA.getY() - posB.getY()) == 2) {
       return posA.getX() == posB.getX();
     }
