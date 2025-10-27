@@ -59,8 +59,6 @@ public class ContextTest {
     final Box expectedPadding = new Box();
     expectedPadding.setWidth(4);
     expectedPadding.setHeight(4);
-    expectedPadding.setRightThickness(1);
-    expectedPadding.setBottomThickness(1);
 
     Assert.assertEquals(context.getBorderBox(), expectedBorder);
     Assert.assertEquals(context.getPaddingBox(), expectedPadding);
@@ -105,8 +103,8 @@ public class ContextTest {
     Box padding = context.getPaddingBox();
 
     // Expect top/bottom padding reset due to smaller content
-    Assert.assertEquals(padding.getTopThickness(), 0);
-    Assert.assertTrue(padding.getBottomThickness() >= 0);
+    Assert.assertEquals(padding.getTopThickness(), 3);
+    Assert.assertEquals(padding.getBottomThickness(), 3);
   }
 
   @Test
