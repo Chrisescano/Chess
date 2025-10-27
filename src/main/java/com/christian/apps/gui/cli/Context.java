@@ -17,7 +17,6 @@ public class Context {
   public void calculateBounds(final Buffer2D contentBuffer) {
     if (isStale) {
       calculatePaddingBounds();
-      calculateContentBounds(contentBuffer.getBufferWidth(), contentBuffer.getBufferHeight());
       isStale = false;
     }
   }
@@ -36,7 +35,8 @@ public class Context {
     isStale = true;
   }
 
-  public void setPaddingThickness(final int top, final int bottom, final int left, final int right) {
+  public void setPaddingThickness(final int top, final int bottom, final int left,
+      final int right) {
     paddingBox.setTopThickness(top);
     paddingBox.setBottomThickness(bottom);
     paddingBox.setLeftThickness(left);
@@ -61,7 +61,7 @@ public class Context {
     if (!(o instanceof Context context)) {
       return false;
     }
-    return isStale == context.isStale && Objects.equals(marginBox, context.marginBox)
+    return Objects.equals(marginBox, context.marginBox)
         && Objects.equals(borderBox, context.borderBox) && Objects.equals(paddingBox,
         context.paddingBox) && Objects.equals(marginStyle, context.marginStyle)
         && Objects.equals(borderStyle, context.borderStyle) && Objects.equals(
@@ -70,32 +70,16 @@ public class Context {
 
   @Override
   public int hashCode() {
-    return Objects.hash(marginBox, borderBox, paddingBox, marginStyle, borderStyle, paddingStyle, isStale);
+    return Objects.hash(marginBox, borderBox, paddingBox, marginStyle, borderStyle, paddingStyle);
   }
 
   /*-- Helper Methods --*/
 
   private void calculatePaddingBounds() {
+    paddingBox.setX(borderBox.getInnerStartX());
+    paddingBox.setY(borderBox.getInnerStartY());
     paddingBox.setWidth(borderBox.getInnerWidth());
     paddingBox.setHeight(borderBox.getInnerHeight());
-  }
-  
-  private void calculateContentBounds(final int contentWidth, final int contentHeight) {
-    if (contentWidth < paddingBox.getWidth()) {
-      paddingBox.setLeftThickness(0);
-      paddingBox.setRightThickness(paddingBox.getWidth() - contentWidth);
-    } else {
-      paddingBox.setLeftThickness(0);
-      paddingBox.setRightThickness(0);
-    }
-
-    if (contentHeight < paddingBox.getHeight()) {
-      paddingBox.setTopThickness(0);
-      paddingBox.setBottomThickness(paddingBox.getHeight() - contentHeight);
-    } else {
-      paddingBox.setTopThickness(0);
-      paddingBox.setBottomThickness(0);
-    }
   }
 
   /*-- Getters/Setters --*/

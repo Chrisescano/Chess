@@ -18,15 +18,12 @@ public class Buffer2D {
   /*-- Methods --*/
 
   public static Buffer2D create(final int width, final int height) {
-    if (width == 0 || height == 0) {
-      return null;
-    }
     return new Buffer2D(new char[height][width], width, height);
   }
 
   public static Buffer2D wrap(final char[][] data) {
-    if (data == null || data.length == 0) {
-      return null;
+    if (data == null) {
+      return Buffer2D.create(0, 0);
     }
     return new Buffer2D(data, data[0].length, data.length);
   }
