@@ -123,4 +123,63 @@ public class ComponentTest {
 
     Assert.assertEquals(rendered, expected);
   }
+
+  @Test
+  public void testRendering_reducedSize_borderOnly() {
+    final Context ctx = component.getContext();
+    ctx.setBorderSize(4, 4);
+    ctx.setBorderThickness(1, 1, 1, 1);
+    ctx.setBorderStyle(borderStyle);
+
+    final Buffer2D rendered = component.render();
+    final Buffer2D expected = Buffer2D.wrap(new char[][]{
+        {'+', '-', '-', '+'},
+        {'|', 'A', 'B', '|'},
+        {'|', 'C', 'D', '|'},
+        {'+', '-', '-', '+'}
+    });
+
+    Assert.assertEquals(rendered, expected);
+  }
+
+  @Test
+  public void testRendering_reducedSize_borderPaddingOnly() {
+    final Context ctx = component.getContext();
+    ctx.setBorderSize(4, 4);
+    ctx.setBorderThickness(1, 1, 1, 1);
+    ctx.setPaddingThickness(1, 1, 1, 1);
+    ctx.setBorderStyle(borderStyle);
+    ctx.setPaddingStyle(paddingStyle);
+
+    final Buffer2D rendered = component.render();
+    final Buffer2D expected = Buffer2D.wrap(new char[][]{
+        {'+', '-', '-', '+'},
+        {'|', ' ', ' ', '|'},
+        {'|', ' ', ' ', '|'},
+        {'+', '-', '-', '+'}
+    });
+
+    Assert.assertEquals(rendered, expected);
+  }
+
+  @Test
+  public void testRendering_unevenSize() {
+    final Context ctx = component.getContext();
+    ctx.setBorderSize(6, 5);
+    ctx.setBorderThickness(1, 1, 1, 1);
+    ctx.setPaddingThickness(0, 1, 1, 1);
+    ctx.setBorderStyle(borderStyle);
+    ctx.setPaddingStyle(paddingStyle);
+
+    final Buffer2D rendered = component.render();
+    final Buffer2D expected = Buffer2D.wrap(new char[][]{
+        {'+', '-', '-', '-', '-', '+'},
+        {'|', ' ', 'A', 'B', ' ', '|'},
+        {'|', ' ', 'C', 'D', ' ', '|'},
+        {'|', ' ', ' ', ' ', ' ', '|'},
+        {'+', '-', '-', '-', '-', '+'}
+    });
+
+    Assert.assertEquals(rendered, expected);
+  }
 }
